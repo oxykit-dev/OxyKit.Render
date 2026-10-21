@@ -1,0 +1,22 @@
+---
+description: On-disk Scriban templates and JSON Schema contracts
+globs: src/OxyKit.Render.Api/templates/**/*,**/templates/**/template.html,**/templates/**/contract.json
+alwaysApply: false
+---
+
+# Templates
+
+Layout: `templates/{id}/template.html` + `contract.json` (both required). Root from `Rendering:TemplatesRoot`.
+
+## Authoring
+
+- `<body class="pf-document">`. Shared print CSS is injected at render time - do not `<link>` stylesheets (PeachPDF will not load them).
+- Document-specific CSS only in a `<style>` block in `template.html`.
+- Prefer `{{ name }}` for values; strings from `data` are HTML-escaped before Scriban.
+- `contract.json`: JSON Schema draft 2020-12; prefer `additionalProperties: false` and explicit `required`.
+
+## Code path (do not re-explore)
+
+`Core/Inputs/TemplateStore.Load` -> `TemplateDataValidator.Validate` -> `ScribanTemplateRenderer.Render` -> `PrintBaselineInjector` -> optional `HtmlToPdfRenderer`.
+
+Sample: `src/OxyKit.Render.Api/templates/invoice/`. Path traversal / unknown ids already rejected in `TemplateStore`.

@@ -1,0 +1,35 @@
+---
+description: Rendering pipeline ownership after Core extract
+globs: src/OxyKit.Render.Core/**/*.cs,src/OxyKit.Render.Api/Endpoints/**/*.cs
+alwaysApply: false
+---
+
+# Render pipeline
+
+## Ownership
+
+| Concern | Owner |
+|---|-----|
+| Orchestration, `SupportedFormats`, concurrency gate | `OxyKit.Render.Core/DocumentRenderService` |
+| HTTP mapping, 400/500 mapping | `Api/Endpoints/RenderEndpoints.ExecuteRender` |
+| Request DTOs | `OxyKit.Render.Contracts/RenderRequests.cs` |
+| Sheet/CSV validation & cell typing | `Core/Inputs/TableWorkbookConstraints`, `CsvTableParser`, `IsoDateCell` |
+| Emitters | `Core/Outputs/*Renderer` -> `RenderResult` |
+| OpenAPI request schemas | `Api/OpenApi/RenderRequestSchemaTransformers.cs` |
+| DI registration | `Core/ServiceCollectionExtensions.AddRenderCore` |
+
+## Patterns
+
+- New emitters: `internal sealed`, `RenderAsync(...)`, return `RenderResult(bytes, contentType, fileName)`.
+- Bad input -> `ArgumentException` / `NotSupportedException` (becomes 400). Do not invent new error DTO shapes (`ErrorResponse` in Contracts).
+- PDF page options via OxyKit.Render `PdfPageSize` / `PdfPageOrientation` and `PdfPageOptionsResolver` (maps to PeachPDF only at emit).
+- Template HTML must run through `PrintBaselineInjector.Apply` before return or PDF.
+- Put parse/validate/template work inside `DocumentRenderService.ExecuteAsync` so the concurrency gate covers CPU prep.
+
+## Anti-patterns
+
+- Duplicating sheet limits outside `TableWorkbookConstraints`
+- Re-enabling PeachPDF HTTP or `file:` loading
+- Putting PeachPDF types on request DTOs
+- Putting Cloud tenancy/storage into this engine repo
+- Referencing `OxyKit.Render.Core` from Cloud (Cloud must use `OxyKit.Render.Client` -> OxyKit.Render API)

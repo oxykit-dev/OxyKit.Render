@@ -1,0 +1,47 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>OxyKit.Render.Core</RootNamespace>
+    <Description>OxyKit.Render document rendering engine (PDF, XLSX, CSV, HTML).</Description>
+    <PackageId>OxyKit.Render.Core</PackageId>
+    <Version>0.1.0</Version>
+    <Authors>OxyKit.Render</Authors>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="OxyKit.Render.Api" />
+    <InternalsVisibleTo Include="OxyKit.Render.Api.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\OxyKit.Render.Contracts\OxyKit.Render.Contracts.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ClosedXML" Version="0.105.1" />
+    <PackageReference Include="JsonSchema.Net" Version="9.4.1" />
+    <PackageReference
+      Include="Microsoft.Extensions.DependencyInjection.Abstractions"
+      Version="10.0.13"
+    />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.13" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.13" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="10.0.13" />
+    <PackageReference
+      Include="Microsoft.Extensions.Options.ConfigurationExtensions"
+      Version="10.0.13"
+    />
+    <PackageReference Include="PeachPDF" Version="0.9.23" />
+    <PackageReference Include="Scriban" Version="7.5.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource
+      Include="assets\print-baseline.css"
+      LogicalName="OxyKit.Render.Core.assets.print-baseline.css"
+    />
+  </ItemGroup>
+</Project>

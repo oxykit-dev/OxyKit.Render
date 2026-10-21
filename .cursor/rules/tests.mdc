@@ -1,0 +1,17 @@
+---
+description: OxyKit.Render xUnit test conventions
+globs: tests/**/*.cs
+alwaysApply: false
+---
+
+# Tests
+
+- Local: `tests/OxyKit.Render.Api.Tests` (xUnit + `WebApplicationFactory<Program>`).
+- Client: `tests/OxyKit.Render.Client.Tests`.
+- Mirror product folders: `Inputs/`, `Outputs/`, `Endpoints/`.
+- Local API tests: send `X-OxyKit-Render-Key`; assert `/health` and `/v1/health` stay anonymous.
+- Internals are visible to the test assembly - test `internal` helpers directly when that is cheaper than HTTP.
+- Run:
+ - `dotnet test tests/OxyKit.Render.Api.Tests/OxyKit.Render.Api.Tests.csproj`
+ - `dotnet test tests/OxyKit.Render.Client.Tests/OxyKit.Render.Client.Tests.csproj`
+- Manual/collection smoke lives in `hoppscotch/`; do not embed the collection JSON in the agent context.

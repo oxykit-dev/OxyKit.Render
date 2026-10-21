@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>OxyKit.Render.Contracts</RootNamespace>
+    <Description>Shared request/response contracts for OxyKit.Render Local and Cloud.</Description>
+    <PackageId>OxyKit.Render.Contracts</PackageId>
+    <Version>0.1.0</Version>
+    <Authors>OxyKit.Render</Authors>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://oxykit.dev</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/oxykit-dev/OxyKit.Render</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>oxykit;render;contracts</PackageTags>
+    <IsPackable>true</IsPackable>
+  </PropertyGroup>
+</Project>

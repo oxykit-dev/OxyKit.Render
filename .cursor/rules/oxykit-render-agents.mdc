@@ -1,0 +1,14 @@
+---
+description: OxyKit.Render agent orientation - prefer AGENTS.md; minimize context load
+alwaysApply: true
+---
+
+# OxyKit.Render agent defaults
+
+- Start from `AGENTS.md` (file map + checklists). Do not load the full `README.md` unless the task needs curl/examples or human-facing endpoint prose.
+- Do not read `bin/`, `obj/`, or Hoppscotch/OpenAPI payloads into chat - open the owning `.cs` file or one Hoppscotch request by name.
+- Stack: .NET 10 Minimal API; packages ClosedXML / PeachPDF / Scriban / JsonSchema.Net live in `OxyKit.Render.Core`.
+- Change behavior in the smallest owner: `OxyKit.Render.Contracts` for DTOs, `OxyKit.Render.Client` for SDK, `TableWorkbookConstraints` for limits, `Core/Outputs/*` for bytes, `RenderEndpoints` for HTTP only, `DocumentRenderService` for orchestration.
+- **Core boundary:** do not reference `OxyKit.Render.Core` from `OxyKit.Flow` or other consumers - they use `OxyKit.Render.Client` -> OxyKit.Render API. Flow: `../OxyKit.Flow/AGENTS.md`.
+- After API changes: `dotnet test tests/OxyKit.Render.Api.Tests/OxyKit.Render.Api.Tests.csproj`.
+- After client changes: `dotnet test tests/OxyKit.Render.Client.Tests/OxyKit.Render.Client.Tests.csproj`.

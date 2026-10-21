@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/OxyKit.Render.Api/OxyKit.Render.Api.csproj" />
+    <Project Path="src/OxyKit.Render.Client/OxyKit.Render.Client.csproj" />
+    <Project Path="src/OxyKit.Render.Contracts/OxyKit.Render.Contracts.csproj" />
+    <Project Path="src/OxyKit.Render.Core/OxyKit.Render.Core.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/OxyKit.Render.Api.Tests/OxyKit.Render.Api.Tests.csproj" />
+    <Project Path="tests/OxyKit.Render.Client.Tests/OxyKit.Render.Client.Tests.csproj" />
+  </Folder>
+</Solution>

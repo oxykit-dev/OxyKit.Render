@@ -1,0 +1,706 @@
+{
+  "v": 12,
+  "name": "OxyKit.Render",
+  "variables": [],
+  "description": "Local smoke tests for OxyKit.Render render API (html/csv/table/template \u2192 pdf/xlsx/csv/html). Import with OxyKit.Render.environment.json, then Run collection.",
+  "folders": [
+    {
+      "v": 12,
+      "name": "Health & Security",
+      "variables": [],
+      "description": "Anonymous health + API-key gate for /formats.",
+      "folders": [],
+      "requests": [
+        {
+          "v": "17",
+          "id": "pf-health",
+          "name": "GET /health (anonymous)",
+          "method": "GET",
+          "endpoint": "<<baseUrl>>/health",
+          "params": [],
+          "headers": [],
+          "preRequestScript": "",
+          "testScript": "pw.test(\"status is 200\", () => {\n  pw.expect(pw.response.status).toBe(200);\n});\npw.test(\"status payload is ok\", () => {\n  pw.expect(pw.response.body.status).toBe(\"ok\");\n});\n",
+          "auth": {
+            "authType": "inherit",
+            "authActive": true
+          },
+          "body": {
+            "contentType": null,
+            "body": null
+          },
+          "requestVariables": [],
+          "responses": {},
+          "description": "Liveness check \u2014 no API key required."
+        },
+        {
+          "v": "17",
+          "id": "pf-formats-unauthorized",
+          "name": "GET /formats without API key \u2192 401",
+          "method": "GET",
+          "endpoint": "<<baseUrl>>/formats",
+          "params": [],
+          "headers": [],
+          "preRequestScript": "",
+          "testScript": "pw.test(\"status is 401\", () => {\n  pw.expect(pw.response.status).toBe(401);\n});\n",
+          "auth": {
+            "authType": "inherit",
+            "authActive": true
+          },
+          "body": {
+            "contentType": null,
+            "body": null
+          },
+          "requestVariables": [],
+          "responses": {},
+          "description": "Formats requires the API key header."
+        },
+        {
+          "v": "17",
+          "id": "pf-formats-ok",
+          "name": "GET /formats with API key",
+          "method": "GET",
+          "endpoint": "<<baseUrl>>/formats",
+          "params": [],
+          "headers": [
+            {
+              "key": "X-OxyKit-Render-Key",
+              "value": "<<apiKey>>",
+              "active": true,
+              "description": ""
+            }
+          ],
+          "preRequestScript": "",
+          "testScript": "pw.test(\"status is 200\", () => {\n  pw.expect(pw.response.status).toBe(200);\n});\npw.test(\"lists expected transforms\", () => {\n  const formats = pw.response.body.formats;\n  pw.expect(formats).toBeType(\"object\");\n  const text = JSON.stringify(formats);\n  pw.expect(text.includes(\"html/pdf\")).toBe(true);\n  pw.expect(text.includes(\"csv/pdf\")).toBe(true);\n  pw.expect(text.includes(\"csv/xlsx\")).toBe(true);\n  pw.expect(text.includes(\"table/html\")).toBe(true);\n  pw.expect(text.includes(\"table/pdf\")).toBe(true);\n  pw.expect(text.includes(\"table/xlsx\")).toBe(true);\n  pw.expect(text.includes(\"table/csv\")).toBe(true);\n  pw.expect(text.includes(\"template/html\")).toBe(true);\n  pw.expect(text.includes(\"template/pdf\")).toBe(true);\n});\n",
+          "auth": {
+            "authType": "inherit",
+            "authActive": true
+          },
+          "body": {
+            "contentType": null,
+            "body": null
+          },
+          "requestVariables": [],
+          "responses": {},
+          "description": null
+        }
+      ],
+      "auth": {
+        "authType": "inherit",
+        "authActive": true
+      },
+      "headers": [],
+      "preRequestScript": "",
+      "testScript": ""
+    },
+    {
+      "v": 12,
+      "name": "Templates",
+      "variables": [],
+      "description": "On-disk Scriban templates (sample: invoice) \u2192 HTML preview or PDF.",
+      "folders": [],
+      "requests": [
+        {
+          "v": "17",
+          "id": "pf-templates-list",
+          "name": "GET /templates",
+          "method": "GET",
+          "endpoint": "<<baseUrl>>/templates",
+          "params": [],
+          "headers": [],
+          "preRequestScript": "",
+          "testScript": "pw.test(\"status is 200\", () => {\n  pw.expect(pw.response.status).toBe(200);\n});\npw.test(\"lists invoice sample\", () => {\n  const templates = pw.response.body.templates;\n  pw.expect(templates).toBeType(\"object\");\n  const text = JSON.stringify(templates);\n  pw.expect(text.includes(\"invoice\")).toBe(true);\n  pw.expect(text.includes(\"hasContract\")).toBe(true);\n});\n",
+          "auth": {
+            "authType": "inherit",
+            "authActive": true
+          },
+          "body": {
+            "contentType": null,
+            "body": null
+          },
+          "requestVariables": [],
+          "responses": {},
+          "description": "Lists on-disk template ids and whether each has a contract.json."
+        },
+        {
+          "v": "17",
+          "id": "pf-template-html-ok",
+          "name": "Render template \u2192 HTML",
+          "method": "POST",
+          "endpoint": "<<baseUrl>>/render/template/html",
+          "params": [],
+          "headers": [],
+          "preRequestScript": "",
+          "testScript": "pw.test(\"status is 200\", () => {\n  pw.expect(pw.response.status).toBe(200);\n});\npw.test(\"content-type includes text/html\", () => {\n  const ct = pw.response.headers[\"content-type\"] || \"\";\n  pw.expect(ct.toLowerCase().includes(\"text/html\")).toBe(true);\n});\npw.test(\"renders invoice fields\", () => {\n  const text = typeof pw.response.body === \"string\"\n    ? pw.response.body\n    : String(pw.response.body);\n  pw.expect(text.includes(\"INV-1001\")).toBe(true);\n  pw.expect(text.includes(\"Acme Corp\")).toBe(true);\n  pw.expect(text.includes(\"Widget\")).toBe(true);\n  pw.expect(text.includes(\"pf-document\")).toBe(true);\n});\n",
+          "auth": {
+            "authType": "inherit",
+            "authActive": true
+          },
+          "body": {
+            "contentType": "application/json",
+            "body": "{\n  \"templateId\": \"invoice\",\n  \"data\": {\n    \"invoiceNumber\": \"INV-1001\",\n    \"customerName\": \"Acme Corp\",\n    \"total\": 250,\n    \"lines\": [\n      {\n        \"description\": \"Widget\",\n        \"amount\": 100\n      },\n      {\n        \"description\": \"Service\",\n        \"amount\": 150\n      }\n    ]\n  }\n}"
+          },
+          "requestVariables": [],
+          "responses": {},
+          "description": "Validates data against contract.json and returns HTML preview with inlined print baseline."
+        },
+        {
+          "v": "17",
+          "id": "pf-template-pdf-ok",
+          "name": "Render template \u2192 PDF",
+          "method": "POST",
+          "endpoint": "<<baseUrl>>/render/template/pdf",
+          "params": [],
+          "headers": [],
+          "preRequestScript": "",
+          "testScript": "pw.test(\"status is 200\", () => {\n  pw.expect(pw.response.status).toBe(200);\n});\npw.test(\"content-type includes application/pdf\", () => {\n  const ct = pw.response.headers[\"content-type\"] || \"\";\n  pw.expect(ct.toLowerCase().includes(\"application/pdf\")).toBe(true);\n});\n",
+          "auth": {
+            "authType": "inherit",
+            "authActive": true
+          },
+          "body": {
+            "contentType": "application/json",
+            "body": "{\n  \"templateId\": \"invoice\",\n  \"data\": {\n    \"invoiceNumber\": \"INV-1001\",\n    \"customerName\": \"Acme Corp\",\n    \"total\": 250,\n    \"lines\": [\n      {\n        \"description\": \"Widget\",\n        \"amount\": 100\n      },\n      {\n        \"description\": \"Service\",\n        \"amount\": 150\n      }\n    ]\n  },\n  \"pageSize\": \"A4\",\n  \"pageOrientation\": \"Portrait\"\n}"
+          },
+          "requestVariables": [],
+          "responses": {},
+          "description": "Same as HTML render, then PeachPDF."
+        },
+        {
+          "v": "17",
+          "id": "pf-template-pdf-invalid-data",
+          "name": "Invalid data \u2192 400",
+          "method": "POST",
+          "endpoint": "<<baseUrl>>/render/template/pdf",
+          "params": [],
+          "headers": [],
+          "preRequestScript": "",
+          "testScript": "pw.test(\"status is 400\", () => {\n  pw.expect(pw.response.status).toBe(400);\n});\npw.test(\"error mentions invoice\", () => {\n  const body = pw.response.body;\n  const msg = typeof body === \"string\" ? body : (body && body.error) || JSON.stringify(body);\n  pw.expect(String(msg).toLowerCase().includes(\"invoice\")).toBe(true);\n});\n",
+          "auth": {
+            "authType": "inherit",
+            "authActive": true
+          },
+          "body": {
+            "contentType": "application/json",
+            "body": "{\n  \"templateId\": \"invoice\",\n  \"data\": {\n    \"invoiceNumber\": \"INV-1\"\n  }\n}"
+          },
+          "requestVariables": [],
+          "responses": {},
+          "description": "Missing required contract fields."
+        },
+        {
+          "v": "17",
+          "id": "pf-template-html-extra-props",
+          "name": "Additional properties \u2192 400",
+          "method": "POST",
+          "endpoint": "<<baseUrl>>/render/template/html",
+          "params": [],
+          "headers": [],
+          "preRequestScript": "",
+          "testScript": "pw.test(\"status is 400\", () => {\n  pw.expect(pw.response.status).toBe(400);\n});\npw.test(\"error mentions invoice\", () => {\n  const body = pw.response.body;\n  const msg = typeof body === \"string\" ? body : (body && body.error) || JSON.stringify(body);\n  pw.expect(String(msg).toLowerCase().includes(\"invoice\")).toBe(true);\n});\n",
+          "auth": {
+            "authType": "inherit",
+            "authActive": true
+          },
+          "body": {
+            "contentType": "application/json",
+            "body": "{\n  \"templateId\": \"invoice\",\n  \"data\": {\n    \"invoiceNumber\": \"INV-1001\",\n    \"customerName\": \"Acme Corp\",\n    \"total\": 250,\n    \"lines\": [\n      {\n        \"description\": \"Widget\",\n        \"amount\": 100\n      }\n    ],\n    \"unexpected\": true\n  }\n}"
+          },
+          "requestVariables": [],
+          "responses": {},
+          "description": "contract.json sets additionalProperties: false."
+        },
+        {
+          "v": "17",
+          "id": "pf-template-pdf-unknown",
+          "name": "Unknown template \u2192 400",
+          "method": "POST",
+          "endpoint": "<<baseUrl>>/render/template/pdf",
+          "params": [],
+          "headers": [],
+          "preRequestScript": "",
+          "testScript": "pw.test(\"status is 400\", () => {\n  pw.expect(pw.response.status).toBe(400);\n});\npw.test(\"error mentions not found\", () => {\n  const body = pw.response.body;\n  const msg = typeof body === \"string\" ? body : (body && body.error) || JSON.stringify(body);\n  pw.expect(String(msg).toLowerCase().includes(\"not found\")).toBe(true);\n});\n",
+          "auth": {
+            "authType": "inherit",
+            "authActive": true
+          },
+          "body": {
+            "contentType": "application/json",
+            "body": "{\n  \"templateId\": \"nope\",\n  \"data\": {}\n}"
+          },
+          "requestVariables": [],
+          "responses": {},
+          "description": null
+        }
+      ],
+      "auth": {
+        "authType": "inherit",
+        "authActive": true
+      },
+      "headers": [
+        {
+          "key": "X-OxyKit-Render-Key",
+          "value": "<<apiKey>>",
+          "active": true,
+          "description": ""
+        }
+      ],
+      "preRequestScript": "",
+      "testScript": ""
+    },
+    {
+      "v": 12,
+      "name": "HTML \u2192 PDF",
+      "variables": [],
+      "description": null,
+      "folders": [],
+      "requests": [
+        {
+          "v": "17",
+          "id": "pf-html-pdf-ok",
+          "name": "Render HTML \u2192 PDF",
+          "method": "POST",
+          "endpoint": "<<baseUrl>>/render/html/pdf",
+          "params": [],
+          "headers": [],
+          "preRequestScript": "",
+          "testScript": "pw.test(\"status is 200\", () => {\n  pw.expect(pw.response.status).toBe(200);\n});\npw.test(\"content-type includes application/pdf\", () => {\n  const ct = pw.response.headers[\"content-type\"] || pw.response.headers[\"content-type\"] || \"\";\n  pw.expect(ct.toLowerCase()).toBeType(\"string\");\n  pw.expect(ct.toLowerCase().includes(\"application/pdf\")).toBe(true);\n});\n",
+          "auth": {
+            "authType": "inherit",
+            "authActive": true
+          },
+          "body": {
+            "contentType": "application/json",
+            "body": "{\n  \"content\": \"<h1>OxyKit.Render</h1><p>Hoppscotch smoke test</p>\",\n  \"pageSize\": \"A4\",\n  \"pageOrientation\": \"Portrait\"\n}"
+          },
+          "requestVariables": [],
+          "responses": {},
+          "description": null
+        },
+        {
+          "v": "17",
+          "id": "pf-html-pdf-missing-content",
+          "name": "Missing content \u2192 400",
+          "method": "POST",
+          "endpoint": "<<baseUrl>>/render/html/pdf",
+          "params": [],
+          "headers": [],
+          "preRequestScript": "",
+          "testScript": "pw.test(\"status is 400\", () => {\n  pw.expect(pw.response.status).toBe(400);\n});\npw.test(\"error mentions expected detail\", () => {\n  const body = pw.response.body;\n  const msg = typeof body === \"string\" ? body : (body && body.error) || JSON.stringify(body);\n  pw.expect(String(msg).toLowerCase().includes(\"content\")).toBe(true);\n});\n",
+          "auth": {
+            "authType": "inherit",
+            "authActive": true
+          },
+          "body": {
+            "contentType": "application/json",
+            "body": "{\n  \"pageSize\": \"A4\"\n}"
+          },
+          "requestVariables": [],
+          "responses": {},
+          "description": null
+        }
+      ],
+      "auth": {
+        "authType": "inherit",
+        "authActive": true
+      },
+      "headers": [
+        {
+          "key": "X-OxyKit-Render-Key",
+          "value": "<<apiKey>>",
+          "active": true,
+          "description": ""
+        }
+      ],
+      "preRequestScript": "",
+      "testScript": ""
+    },
+    {
+      "v": 12,
+      "name": "CSV \u2192 PDF / Excel",
+      "variables": [],
+      "description": "RFC 4180 CSV text in content \u2192 PDF or XLSX.",
+      "folders": [],
+      "requests": [
+        {
+          "v": "17",
+          "id": "pf-csv-xlsx-ok",
+          "name": "Render CSV \u2192 XLSX",
+          "method": "POST",
+          "endpoint": "<<baseUrl>>/render/csv/xlsx",
+          "params": [],
+          "headers": [],
+          "preRequestScript": "",
+          "testScript": "pw.test(\"status is 200\", () => {\n  pw.expect(pw.response.status).toBe(200);\n});\npw.test(\"content-type is xlsx\", () => {\n  const ct = pw.response.headers[\"content-type\"] || \"\";\n  pw.expect(ct.toLowerCase().includes(\"spreadsheetml\")).toBe(true);\n});\n",
+          "auth": {
+            "authType": "inherit",
+            "authActive": true
+          },
+          "body": {
+            "contentType": "application/json",
+            "body": "{\n  \"content\": \"Id,Customer,Total,OrderedOn\\n1,\\\"Acme, Inc\\\",120.5,2024-01-15\\n2,Beta,80,2024-02-01T14:30:00Z\",\n  \"hasHeader\": true,\n  \"name\": \"Orders\"\n}"
+          },
+          "requestVariables": [],
+          "responses": {},
+          "description": null
+        },
+        {
+          "v": "17",
+          "id": "pf-csv-pdf-ok",
+          "name": "Render CSV \u2192 PDF",
+          "method": "POST",
+          "endpoint": "<<baseUrl>>/render/csv/pdf",
+          "params": [],
+          "headers": [],
+          "preRequestScript": "",
+          "testScript": "pw.test(\"status is 200\", () => {\n  pw.expect(pw.response.status).toBe(200);\n});\npw.test(\"content-type is pdf\", () => {\n  const ct = pw.response.headers[\"content-type\"] || \"\";\n  pw.expect(ct.toLowerCase().includes(\"application/pdf\")).toBe(true);\n});\n",
+          "auth": {
+            "authType": "inherit",
+            "authActive": true
+          },
+          "body": {
+            "contentType": "application/json",
+            "body": "{\n  \"content\": \"Id,Customer\\n1,Acme\\n2,Beta\",\n  \"name\": \"Orders\",\n  \"pageOrientation\": \"Landscape\"\n}"
+          },
+          "requestVariables": [],
+          "responses": {},
+          "description": null
+        },
+        {
+          "v": "17",
+          "id": "pf-csv-xlsx-missing",
+          "name": "Missing content \u2192 400",
+          "method": "POST",
+          "endpoint": "<<baseUrl>>/render/csv/xlsx",
+          "params": [],
+          "headers": [],
+          "preRequestScript": "",
+          "testScript": "pw.test(\"status is 400\", () => {\n  pw.expect(pw.response.status).toBe(400);\n});\npw.test(\"error mentions content\", () => {\n  const body = pw.response.body;\n  const msg = typeof body === \"string\" ? body : (body && body.error) || JSON.stringify(body);\n  pw.expect(String(msg).toLowerCase().includes(\"content\")).toBe(true);\n});\n",
+          "auth": {
+            "authType": "inherit",
+            "authActive": true
+          },
+          "body": {
+            "contentType": "application/json",
+            "body": "{\n  \"name\": \"Orders\"\n}"
+          },
+          "requestVariables": [],
+          "responses": {},
+          "description": null
+        }
+      ],
+      "auth": {
+        "authType": "inherit",
+        "authActive": true
+      },
+      "headers": [
+        {
+          "key": "X-OxyKit-Render-Key",
+          "value": "<<apiKey>>",
+          "active": true,
+          "description": ""
+        }
+      ],
+      "preRequestScript": "",
+      "testScript": ""
+    },
+    {
+      "v": 12,
+      "name": "Table \u2192 HTML",
+      "variables": [],
+      "description": "Standalone HTML preview using the shared print baseline stylesheet.",
+      "folders": [],
+      "requests": [
+        {
+          "v": "17",
+          "id": "pf-table-html-ok",
+          "name": "Render table \u2192 HTML",
+          "method": "POST",
+          "endpoint": "<<baseUrl>>/render/table/html",
+          "params": [],
+          "headers": [],
+          "preRequestScript": "",
+          "testScript": "pw.test(\"status is 200\", () => {\n  pw.expect(pw.response.status).toBe(200);\n});\npw.test(\"content-type includes text/html\", () => {\n  const ct = pw.response.headers[\"content-type\"] || \"\";\n  pw.expect(ct.toLowerCase().includes(\"text/html\")).toBe(true);\n});\n",
+          "auth": {
+            "authType": "inherit",
+            "authActive": true
+          },
+          "body": {
+            "contentType": "application/json",
+            "body": "{\n  \"sheets\": [\n    {\n      \"name\": \"Orders\",\n      \"headers\": [\n        \"Id\",\n        \"Customer\",\n        \"Total\",\n        \"Paid\"\n      ],\n      \"rows\": [\n        [\n          1,\n          \"Acme\",\n          120.5,\n          true\n        ],\n        [\n          2,\n          \"Beta\",\n          80,\n          false\n        ]\n      ]\n    }\n  ]\n}"
+          },
+          "requestVariables": [],
+          "responses": {},
+          "description": null
+        }
+      ],
+      "auth": {
+        "authType": "inherit",
+        "authActive": true
+      },
+      "headers": [
+        {
+          "key": "X-OxyKit-Render-Key",
+          "value": "<<apiKey>>",
+          "active": true,
+          "description": ""
+        }
+      ],
+      "preRequestScript": "",
+      "testScript": ""
+    },
+    {
+      "v": 12,
+      "name": "Table \u2192 PDF",
+      "variables": [],
+      "description": null,
+      "folders": [],
+      "requests": [
+        {
+          "v": "17",
+          "id": "pf-table-pdf-ok",
+          "name": "Render table \u2192 PDF",
+          "method": "POST",
+          "endpoint": "<<baseUrl>>/render/table/pdf",
+          "params": [],
+          "headers": [],
+          "preRequestScript": "",
+          "testScript": "pw.test(\"status is 200\", () => {\n  pw.expect(pw.response.status).toBe(200);\n});\npw.test(\"content-type includes application/pdf\", () => {\n  const ct = pw.response.headers[\"content-type\"] || pw.response.headers[\"content-type\"] || \"\";\n  pw.expect(ct.toLowerCase()).toBeType(\"string\");\n  pw.expect(ct.toLowerCase().includes(\"application/pdf\")).toBe(true);\n});\n",
+          "auth": {
+            "authType": "inherit",
+            "authActive": true
+          },
+          "body": {
+            "contentType": "application/json",
+            "body": "{\n  \"sheets\": [\n    {\n      \"name\": \"Orders\",\n      \"headers\": [\n        \"Id\",\n        \"Customer\",\n        \"Total\",\n        \"Paid\"\n      ],\n      \"rows\": [\n        [\n          1,\n          \"Acme\",\n          120.5,\n          true\n        ],\n        [\n          2,\n          \"Beta\",\n          80,\n          false\n        ]\n      ]\n    }\n  ],\n  \"pageOrientation\": \"Landscape\"\n}"
+          },
+          "requestVariables": [],
+          "responses": {},
+          "description": null
+        }
+      ],
+      "auth": {
+        "authType": "inherit",
+        "authActive": true
+      },
+      "headers": [
+        {
+          "key": "X-OxyKit-Render-Key",
+          "value": "<<apiKey>>",
+          "active": true,
+          "description": ""
+        }
+      ],
+      "preRequestScript": "",
+      "testScript": ""
+    },
+    {
+      "v": 12,
+      "name": "Table \u2192 Excel",
+      "variables": [],
+      "description": "Excel export including ISO date coercion and validation failures.",
+      "folders": [],
+      "requests": [
+        {
+          "v": "17",
+          "id": "pf-table-xlsx-ok",
+          "name": "Render table \u2192 XLSX",
+          "method": "POST",
+          "endpoint": "<<baseUrl>>/render/table/xlsx",
+          "params": [],
+          "headers": [],
+          "preRequestScript": "",
+          "testScript": "pw.test(\"status is 200\", () => {\n  pw.expect(pw.response.status).toBe(200);\n});\npw.test(\"content-type includes application/vnd.openxmlformats-officedocument.spreadsheetml.sheet\", () => {\n  const ct = pw.response.headers[\"content-type\"] || pw.response.headers[\"content-type\"] || \"\";\n  pw.expect(ct.toLowerCase()).toBeType(\"string\");\n  pw.expect(ct.toLowerCase().includes(\"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet\")).toBe(true);\n});\n",
+          "auth": {
+            "authType": "inherit",
+            "authActive": true
+          },
+          "body": {
+            "contentType": "application/json",
+            "body": "{\n  \"sheets\": [\n    {\n      \"name\": \"Orders\",\n      \"headers\": [\n        \"Id\",\n        \"Customer\",\n        \"Total\",\n        \"Paid\"\n      ],\n      \"rows\": [\n        [\n          1,\n          \"Acme\",\n          120.5,\n          true\n        ],\n        [\n          2,\n          \"Beta\",\n          80,\n          false\n        ]\n      ]\n    }\n  ]\n}"
+          },
+          "requestVariables": [],
+          "responses": {},
+          "description": null
+        },
+        {
+          "v": "17",
+          "id": "pf-table-xlsx-dates",
+          "name": "XLSX with ISO dates",
+          "method": "POST",
+          "endpoint": "<<baseUrl>>/render/table/xlsx",
+          "params": [],
+          "headers": [],
+          "preRequestScript": "",
+          "testScript": "pw.test(\"status is 200\", () => {\n  pw.expect(pw.response.status).toBe(200);\n});\npw.test(\"content-type includes application/vnd.openxmlformats-officedocument.spreadsheetml.sheet\", () => {\n  const ct = pw.response.headers[\"content-type\"] || pw.response.headers[\"content-type\"] || \"\";\n  pw.expect(ct.toLowerCase()).toBeType(\"string\");\n  pw.expect(ct.toLowerCase().includes(\"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet\")).toBe(true);\n});\n",
+          "auth": {
+            "authType": "inherit",
+            "authActive": true
+          },
+          "body": {
+            "contentType": "application/json",
+            "body": "{\n  \"sheets\": [\n    {\n      \"name\": \"Orders\",\n      \"headers\": [\n        \"Id\",\n        \"Day\",\n        \"At\",\n        \"Utc\",\n        \"Label\"\n      ],\n      \"rows\": [\n        [\n          1,\n          \"2024-01-15\",\n          \"2024-01-15T14:30:00\",\n          \"2024-01-15T14:30:00Z\",\n          \"not-a-date\"\n        ],\n        [\n          2,\n          \"2024-02-01\",\n          \"2024-02-01T09:00:00.123\",\n          \"2024-02-01T14:30:00+08:00\",\n          \"01/15/2024\"\n        ]\n      ]\n    }\n  ]\n}"
+          },
+          "requestVariables": [],
+          "responses": {},
+          "description": "ISO date/date-time strings become Excel date cells; non-ISO stay text."
+        },
+        {
+          "v": "17",
+          "id": "pf-table-xlsx-object-cell",
+          "name": "Object cell \u2192 400",
+          "method": "POST",
+          "endpoint": "<<baseUrl>>/render/table/xlsx",
+          "params": [],
+          "headers": [],
+          "preRequestScript": "",
+          "testScript": "pw.test(\"status is 400\", () => {\n  pw.expect(pw.response.status).toBe(400);\n});\npw.test(\"error mentions expected detail\", () => {\n  const body = pw.response.body;\n  const msg = typeof body === \"string\" ? body : (body && body.error) || JSON.stringify(body);\n  pw.expect(String(msg).toLowerCase().includes(\"string, number, boolean, or null\")).toBe(true);\n});\n",
+          "auth": {
+            "authType": "inherit",
+            "authActive": true
+          },
+          "body": {
+            "contentType": "application/json",
+            "body": "{\n  \"sheets\": [\n    {\n      \"name\": \"Orders\",\n      \"headers\": [\n        \"Meta\"\n      ],\n      \"rows\": [\n        [\n          {\n            \"nested\": true\n          }\n        ]\n      ]\n    }\n  ]\n}"
+          },
+          "requestVariables": [],
+          "responses": {},
+          "description": null
+        },
+        {
+          "v": "17",
+          "id": "pf-table-xlsx-ragged",
+          "name": "Ragged rows \u2192 400",
+          "method": "POST",
+          "endpoint": "<<baseUrl>>/render/table/xlsx",
+          "params": [],
+          "headers": [],
+          "preRequestScript": "",
+          "testScript": "pw.test(\"status is 400\", () => {\n  pw.expect(pw.response.status).toBe(400);\n});\npw.test(\"error mentions expected detail\", () => {\n  const body = pw.response.body;\n  const msg = typeof body === \"string\" ? body : (body && body.error) || JSON.stringify(body);\n  pw.expect(String(msg).toLowerCase().includes(\"expected 2\")).toBe(true);\n});\n",
+          "auth": {
+            "authType": "inherit",
+            "authActive": true
+          },
+          "body": {
+            "contentType": "application/json",
+            "body": "{\n  \"sheets\": [\n    {\n      \"name\": \"Orders\",\n      \"headers\": [\n        \"Id\",\n        \"Customer\"\n      ],\n      \"rows\": [\n        [\n          1,\n          \"Acme\"\n        ],\n        [\n          2\n        ]\n      ]\n    }\n  ]\n}"
+          },
+          "requestVariables": [],
+          "responses": {},
+          "description": null
+        }
+      ],
+      "auth": {
+        "authType": "inherit",
+        "authActive": true
+      },
+      "headers": [
+        {
+          "key": "X-OxyKit-Render-Key",
+          "value": "<<apiKey>>",
+          "active": true,
+          "description": ""
+        }
+      ],
+      "preRequestScript": "",
+      "testScript": ""
+    },
+    {
+      "v": 12,
+      "name": "Table \u2192 CSV",
+      "variables": [],
+      "description": null,
+      "folders": [],
+      "requests": [
+        {
+          "v": "17",
+          "id": "pf-table-csv-ok",
+          "name": "Render table \u2192 CSV",
+          "method": "POST",
+          "endpoint": "<<baseUrl>>/render/table/csv",
+          "params": [],
+          "headers": [],
+          "preRequestScript": "",
+          "testScript": "pw.test(\"status is 200\", () => {\n  pw.expect(pw.response.status).toBe(200);\n});\npw.test(\"content-type includes text/csv\", () => {\n  const ct = pw.response.headers[\"content-type\"] || pw.response.headers[\"content-type\"] || \"\";\n  pw.expect(ct.toLowerCase()).toBeType(\"string\");\n  pw.expect(ct.toLowerCase().includes(\"text/csv\")).toBe(true);\n});\npw.test(\"csv quotes commas and quotes\", () => {\n  const text = typeof pw.response.body === \"string\"\n    ? pw.response.body\n    : String(pw.response.body);\n  pw.expect(text.includes(\"Id,Customer,Note\")).toBe(true);\n  pw.expect(text.includes('\"Acme, Inc\"')).toBe(true);\n  pw.expect(text.includes('\"say \"\"hi\"\"\"')).toBe(true);\n  pw.expect(text.includes(\"2,Beta,\")).toBe(true);\n});\n",
+          "auth": {
+            "authType": "inherit",
+            "authActive": true
+          },
+          "body": {
+            "contentType": "application/json",
+            "body": "{\n  \"sheets\": [\n    {\n      \"name\": \"Orders\",\n      \"headers\": [\n        \"Id\",\n        \"Customer\",\n        \"Note\"\n      ],\n      \"rows\": [\n        [\n          1,\n          \"Acme, Inc\",\n          \"say \\\"hi\\\"\"\n        ],\n        [\n          2,\n          \"Beta\",\n          null\n        ]\n      ]\n    }\n  ]\n}"
+          },
+          "requestVariables": [],
+          "responses": {},
+          "description": null
+        },
+        {
+          "v": "17",
+          "id": "pf-table-csv-dates",
+          "name": "CSV with ISO dates",
+          "method": "POST",
+          "endpoint": "<<baseUrl>>/render/table/csv",
+          "params": [],
+          "headers": [],
+          "preRequestScript": "",
+          "testScript": "pw.test(\"status is 200\", () => {\n  pw.expect(pw.response.status).toBe(200);\n});\npw.test(\"content-type includes text/csv\", () => {\n  const ct = pw.response.headers[\"content-type\"] || pw.response.headers[\"content-type\"] || \"\";\n  pw.expect(ct.toLowerCase()).toBeType(\"string\");\n  pw.expect(ct.toLowerCase().includes(\"text/csv\")).toBe(true);\n});\npw.test(\"dates serialize as ISO text\", () => {\n  const text = typeof pw.response.body === \"string\"\n    ? pw.response.body\n    : String(pw.response.body);\n  pw.expect(text.includes(\"2024-01-15\")).toBe(true);\n  pw.expect(text.includes(\"2024-01-15T14:30:00\")).toBe(true);\n  pw.expect(text.includes(\"2024-01-15T14:30:00Z\")).toBe(true);\n});\n",
+          "auth": {
+            "authType": "inherit",
+            "authActive": true
+          },
+          "body": {
+            "contentType": "application/json",
+            "body": "{\n  \"sheets\": [\n    {\n      \"name\": \"Orders\",\n      \"headers\": [\n        \"Day\",\n        \"At\",\n        \"Utc\"\n      ],\n      \"rows\": [\n        [\n          \"2024-01-15\",\n          \"2024-01-15T14:30:00\",\n          \"2024-01-15T14:30:00Z\"\n        ]\n      ]\n    }\n  ]\n}"
+          },
+          "requestVariables": [],
+          "responses": {},
+          "description": null
+        },
+        {
+          "v": "17",
+          "id": "pf-table-csv-multi-sheet",
+          "name": "Multiple sheets \u2192 400",
+          "method": "POST",
+          "endpoint": "<<baseUrl>>/render/table/csv",
+          "params": [],
+          "headers": [],
+          "preRequestScript": "",
+          "testScript": "pw.test(\"status is 400\", () => {\n  pw.expect(pw.response.status).toBe(400);\n});\npw.test(\"error mentions expected detail\", () => {\n  const body = pw.response.body;\n  const msg = typeof body === \"string\" ? body : (body && body.error) || JSON.stringify(body);\n  pw.expect(String(msg).toLowerCase().includes(\"exactly one sheet\")).toBe(true);\n});\n",
+          "auth": {
+            "authType": "inherit",
+            "authActive": true
+          },
+          "body": {
+            "contentType": "application/json",
+            "body": "{\n  \"sheets\": [\n    {\n      \"name\": \"A\",\n      \"headers\": [\n        \"Id\"\n      ],\n      \"rows\": [\n        [\n          1\n        ]\n      ]\n    },\n    {\n      \"name\": \"B\",\n      \"headers\": [\n        \"Id\"\n      ],\n      \"rows\": [\n        [\n          2\n        ]\n      ]\n    }\n  ]\n}"
+          },
+          "requestVariables": [],
+          "responses": {},
+          "description": null
+        }
+      ],
+      "auth": {
+        "authType": "inherit",
+        "authActive": true
+      },
+      "headers": [
+        {
+          "key": "X-OxyKit-Render-Key",
+          "value": "<<apiKey>>",
+          "active": true,
+          "description": ""
+        }
+      ],
+      "preRequestScript": "",
+      "testScript": ""
+    }
+  ],
+  "requests": [],
+  "auth": {
+    "authType": "none",
+    "authActive": true
+  },
+  "headers": [],
+  "preRequestScript": "",
+  "testScript": ""
+}

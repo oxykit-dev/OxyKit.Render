@@ -1,0 +1,128 @@
+/* PhaseFlow print baseline — inlined into table HTML/PDF and template HTML/PDF.
+   Scope: put class="pf-document" on <body>. Tables, sections, and headings
+   are styled by element. Opt-in modifiers: .pf-num, .pf-bool, .pf-meta, .pf-total.
+   Do not <link> this file — PeachPDF does not load linked or remote CSS.
+   Template-specific overrides belong in a later <style> block in template.html. */
+
+@page {
+  size: A4;
+  margin: 16mm;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+body.pf-document {
+  margin: 0;
+  padding: 0;
+  color: #1a1a1a;
+  background: #fff;
+  font-family: "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
+  font-size: 11pt;
+  line-height: 1.45;
+}
+
+body.pf-document section {
+  margin: 0 0 28px;
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+
+body.pf-document section:last-child {
+  margin-bottom: 0;
+}
+
+body.pf-document h1 {
+  margin: 0 0 12px;
+  padding: 0;
+  color: #111;
+  font-size: 14pt;
+  font-weight: 600;
+  line-height: 1.25;
+  page-break-after: avoid;
+  break-after: avoid;
+}
+
+body.pf-document table {
+  width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0;
+  table-layout: auto;
+  empty-cells: show;
+}
+
+body.pf-document th,
+body.pf-document td {
+  border: 1px solid #c8c8c8;
+  padding: 6px 8px;
+  text-align: left;
+  vertical-align: top;
+  word-wrap: break-word;
+  overflow-wrap: anywhere;
+}
+
+body.pf-document thead th {
+  background: #f0f0f0;
+  color: #111;
+  font-weight: 600;
+  border-bottom-width: 1.5px;
+}
+
+body.pf-document tbody tr:nth-child(even) td {
+  background: #fafafa;
+}
+
+body.pf-document .pf-num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+body.pf-document .pf-bool {
+  text-align: center;
+  white-space: nowrap;
+}
+
+body.pf-document .pf-meta {
+  margin: 0 0 16px;
+  color: #444;
+  font-size: 10.5pt;
+}
+
+body.pf-document .pf-total {
+  margin: 16px 0 0;
+  font-weight: 600;
+  font-size: 12pt;
+}
+
+@media print {
+  body.pf-document {
+    background: transparent;
+  }
+
+  body.pf-document section {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  body.pf-document thead {
+    display: table-header-group;
+  }
+
+  body.pf-document tr {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  body.pf-document a[href]::after {
+    content: none;
+  }
+}

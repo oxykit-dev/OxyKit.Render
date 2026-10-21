@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Invoice {{ invoiceNumber }}</title>
+  <!-- Print baseline is inlined by PhaseFlow; keep only template-specific overrides. -->
+  <style>
+    body.pf-document h1 {
+      margin-bottom: 8px;
+      font-size: 18pt;
+    }
+    body.pf-document .pf-meta {
+      margin-bottom: 24px;
+    }
+  </style>
+</head>
+<body class="pf-document">
+  <h1>Invoice {{ invoiceNumber }}</h1>
+  <p class="pf-meta">Customer: {{ customerName }}</p>
+  <table>
+    <thead>
+      <tr><th>Description</th><th class="pf-num">Amount</th></tr>
+    </thead>
+    <tbody>
+    {{ for line in lines }}
+      <tr>
+        <td>{{ line.description }}</td>
+        <td class="pf-num">{{ line.amount }}</td>
+      </tr>
+    {{ end }}
+    </tbody>
+  </table>
+  <p class="pf-total">Total: {{ total }}</p>
+</body>
+</html>

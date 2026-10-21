@@ -1,0 +1,15 @@
+{
+  "name": "OxyKit.Render Local",
+  "variables": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5066",
+      "secret": false
+    },
+    {
+      "key": "apiKey",
+      "value": "dev-local-key",
+      "secret": true
+    }
+  ]
+}

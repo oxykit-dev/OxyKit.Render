@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>OxyKit.Render.Client</RootNamespace>
+    <Description>Typed HttpClient SDK for OxyKit.Render Local and Cloud APIs.</Description>
+    <PackageId>OxyKit.Render.Client</PackageId>
+    <Version>0.1.0</Version>
+    <Authors>OxyKit.Render</Authors>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://oxykit.dev</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/oxykit-dev/OxyKit.Render</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>oxykit;render;pdf;httpclient</PackageTags>
+    <IsPackable>true</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\OxyKit.Render.Contracts\OxyKit.Render.Contracts.csproj" />
+  </ItemGroup>
+</Project>
