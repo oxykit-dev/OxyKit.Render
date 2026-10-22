@@ -1,11 +1,14 @@
 # OxyKit.Render
 
+[![CI](https://github.com/oxykit-dev/OxyKit.Render/actions/workflows/ci.yml/badge.svg)](https://github.com/oxykit-dev/OxyKit.Render/actions/workflows/ci.yml)
+[![NuGet](https://img.shields.io/nuget/v/OxyKit.Render.Client.svg?label=OxyKit.Render.Client)](https://www.nuget.org/packages/OxyKit.Render.Client)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
+
 Document **render engine** for the [OxyKit](https://oxykit.dev) suite: an HTTP sidecar that turns JSON into PDF, XLSX, CSV, or HTML.
 
-**License:** MIT · **Client:** [`OxyKit.Render.Client`](https://www.nuget.org/packages/OxyKit.Render.Client) `0.1.2` · **Org:** [oxykit-dev](https://github.com/oxykit-dev)  
-**Integrators:** Client only (never `OxyKit.Render.Core`) · **Releases:** [app zips](https://github.com/oxykit-dev/OxyKit.Render/releases)  
-**Site:** [oxykit.dev](https://oxykit.dev) · **Orchestrator:** [OxyKit.Flow](https://github.com/oxykit-dev/OxyKit.Flow)  
-**.NET Framework 2.0 / 4.5+:** raw HTTP — see suite Framework HOW-TO on the docs site (no Client NuGet).
+**License:** MIT · **Org:** [oxykit-dev](https://github.com/oxykit-dev) · **Site:** [oxykit.dev](https://oxykit.dev)  
+**Releases:** [app zips](https://github.com/oxykit-dev/OxyKit.Render/releases) · **Client:** [`OxyKit.Render.Client`](https://www.nuget.org/packages/OxyKit.Render.Client)  
+**Related:** [OxyKit.Flow](https://github.com/oxykit-dev/OxyKit.Flow) · integrators use Client only (never `OxyKit.Render.Core`)
 
 ## Quick start
 
@@ -19,7 +22,7 @@ dotnet run --project src/OxyKit.Render.Api
 |--------------|---------|
 | `http://localhost:5066` | API |
 | `X-OxyKit-Render-Key: dev-local-key` | Dev API key (`appsettings.Development.json`) |
-| `/health` | Anonymous |
+| `GET /health` | Anonymous |
 | `/scalar`, `/openapi/v1.json` | OpenAPI UI + JSON (Development only) |
 | `/formats`, `/templates`, `/render/{input}/{output}` | Authenticated (+ `/v1/...` aliases) |
 
@@ -44,7 +47,9 @@ curl -X POST "http://localhost:5066/render/table/html" \
 dotnet add package OxyKit.Render.Client
 ```
 
-Also: `OxyKit.Render.Contracts` (transitive). Packable packages ship Client + Contracts only — Core stays host-internal. Releases: tag `v*` → [docs/NUGET_PUBLISH.md](./docs/NUGET_PUBLISH.md).
+Also: `OxyKit.Render.Contracts` (transitive). Packable packages ship Client + Contracts only — Core stays host-internal. Tag `v*` → [docs/NUGET_PUBLISH.md](./docs/NUGET_PUBLISH.md).
+
+**.NET Framework 2.0 / 4.5+:** do not use the Client package — call HTTP per the [Framework HOW-TO](https://oxykit.dev/integrate/framework).
 
 Local suite checkout (optional):
 
@@ -73,6 +78,7 @@ Errors: `{ "error": "..." }` (400 / 401 / 403 / 500). Layout and constraints: [A
 | Doc | Role |
 |-----|------|
 | [AGENTS.md](./AGENTS.md) | Layout, constraints, add-transform checklist |
+| [oxykit.dev/render](https://oxykit.dev/render/) | Product docs |
 | [hoppscotch/](./hoppscotch/) | Manual HTTP smoke |
 | [CHANGELOG.md](./CHANGELOG.md) | Keep a Changelog |
 | `/scalar` · `/openapi/v1.json` | Live API shapes (Development) |
