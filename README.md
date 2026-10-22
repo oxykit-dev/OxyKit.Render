@@ -2,9 +2,9 @@
 
 Document **render engine** for the [OxyKit](https://oxykit.dev) suite: an HTTP sidecar that turns JSON into PDF, XLSX, CSV, or HTML.
 
-**License:** MIT · **Version:** 0.1.0 (pre-1.0) · **Org:** [oxykit-dev](https://github.com/oxykit-dev)  
-**Integrators:** `OxyKit.Render.Client` (never `OxyKit.Render.Core`)  
-**Site:** [oxykit.dev](https://oxykit.dev) · **Orchestrator:** [OxyKit.Flow](https://github.com/oxykit-dev/OxyKit.Flow) (public after Client NuGet)  
+**License:** MIT · **Client:** [`OxyKit.Render.Client`](https://www.nuget.org/packages/OxyKit.Render.Client) `0.1.2` · **Org:** [oxykit-dev](https://github.com/oxykit-dev)  
+**Integrators:** Client only (never `OxyKit.Render.Core`) · **Releases:** [app zips](https://github.com/oxykit-dev/OxyKit.Render/releases)  
+**Site:** [oxykit.dev](https://oxykit.dev) · **Orchestrator:** [OxyKit.Flow](https://github.com/oxykit-dev/OxyKit.Flow)  
 **.NET Framework 2.0 / 4.5+:** raw HTTP — see suite Framework HOW-TO on the docs site (no Client NuGet).
 
 ## Quick start
