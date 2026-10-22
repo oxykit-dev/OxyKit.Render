@@ -6,7 +6,7 @@
     <RootNamespace>OxyKit.Render.Contracts</RootNamespace>
     <Description>Shared request/response contracts for OxyKit.Render Local and Cloud.</Description>
     <PackageId>OxyKit.Render.Contracts</PackageId>
-    <Version>0.1.0</Version>
+    <Version>0.1.2</Version>
     <Authors>OxyKit.Render</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://oxykit.dev</PackageProjectUrl>
