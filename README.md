@@ -44,9 +44,9 @@ curl -X POST "http://localhost:5066/render/table/html" \
 dotnet add package OxyKit.Render.Client
 ```
 
-Also: `OxyKit.Render.Contracts`. Packable packages ship Client + Contracts only — Core stays host-internal.
+Also: `OxyKit.Render.Contracts` (transitive). Packable packages ship Client + Contracts only — Core stays host-internal. Releases: tag `v*` → [docs/NUGET_PUBLISH.md](./docs/NUGET_PUBLISH.md).
 
-Until packages are on nuget.org, reference the project from a sibling checkout:
+Local suite checkout (optional):
 
 ```xml
 <ProjectReference Include="..\OxyKit.Render\src\OxyKit.Render.Client\OxyKit.Render.Client.csproj" />
@@ -74,6 +74,6 @@ Errors: `{ "error": "..." }` (400 / 401 / 403 / 500). Layout and constraints: [A
 |-----|------|
 | [AGENTS.md](./AGENTS.md) | Layout, constraints, add-transform checklist |
 | [hoppscotch/](./hoppscotch/) | Manual HTTP smoke |
-| [CHANGELOG.md](./CHANGELOG.md) | `[Unreleased]` until first SemVer tag |
+| [CHANGELOG.md](./CHANGELOG.md) | Keep a Changelog |
 | `/scalar` · `/openapi/v1.json` | Live API shapes (Development) |
 | [LICENSE](./LICENSE) | MIT |

@@ -4,7 +4,7 @@ Token-efficient map. Prefer this over exploring the tree or loading the full REA
 
 ## What it is
 
-**OxyKit** suite core. **MIT** · v0.1 — Client/Contracts packable; Core host-internal (`IsPackable=false`).
+**OxyKit** suite core. **MIT** · v0.1 — Client/Contracts packable (nuget.org via Trusted Publishing / `release-nuget.yml`); Core host-internal (`IsPackable=false`). See `docs/NUGET_PUBLISH.md`.
 
 .NET 10 Minimal API **document render sidecar**: clients POST JSON -> PDF / XLSX / CSV / HTML. Local + API key by default. Shared contracts + HttpClient SDK for Local and suite consumers (e.g. **OxyKit.Flow**).
 

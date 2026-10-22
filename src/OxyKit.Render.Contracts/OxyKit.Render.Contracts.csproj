@@ -15,4 +15,8 @@
     <PackageTags>oxykit;render;contracts</PackageTags>
     <IsPackable>true</IsPackable>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\docs\nuget\OxyKit.Render.Contracts.md" Pack="true" PackagePath="README.md" />
+  </ItemGroup>
 </Project>

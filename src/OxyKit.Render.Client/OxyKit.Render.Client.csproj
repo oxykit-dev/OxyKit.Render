@@ -17,6 +17,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="..\..\docs\nuget\OxyKit.Render.Client.md" Pack="true" PackagePath="README.md" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\OxyKit.Render.Contracts\OxyKit.Render.Contracts.csproj" />
   </ItemGroup>
 </Project>

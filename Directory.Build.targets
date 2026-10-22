@@ -1,0 +1,13 @@
+<Project>
+  <!-- After project evaluation so IsPackable from csproj is visible. Core stays IsPackable=false. -->
+  <PropertyGroup Condition="'$(IsPackable)' == 'true'">
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <DebugType>portable</DebugType>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <!-- SourceLink: .NET SDK embeds it when PublishRepositoryUrl is true (no Microsoft.SourceLink.GitHub pin). -->
+</Project>
