@@ -79,35 +79,45 @@ jobs:
           (cd artifacts && zip -r "../${NUGET_ZIP}" .)
           echo "NUGET_ZIP=${NUGET_ZIP}" >> "$GITHUB_ENV"
 
-      # 3) Runnable app zip
-      - name: Publish and zip runnable app
+      # 3) Runnable app zips — framework-dependent per OS (smaller than self-contained; needs .NET 10 runtime)
+      - name: Publish and zip runnable apps
         run: |
+          set -euo pipefail
           VERSION="${{ steps.version.outputs.VERSION }}"
-          mkdir -p publish/app
-          # Framework-dependent (portable). Requires .NET 10 runtime on the machine.
-          # No AppHost: the CI runner is Linux; a native host would not be cross-OS.
-          dotnet publish src/OxyKit.Render.Api/OxyKit.Render.Api.csproj \
-            -c Release --no-build \
-            -o ./publish/app \
-            -p:UseAppHost=false
-          rm -f ./publish/app/appsettings.Development.json
-          printf '%s\n' \
-            "OxyKit.Render.Api ${VERSION}" \
-            "" \
-            "Requires the .NET 10 runtime:" \
-            "  https://dotnet.microsoft.com/download/dotnet/10.0" \
-            "" \
-            "Set an API key (required in Production), then run:" \
-            "" \
-            "  export Security__ApiKey='your-key'" \
-            "  export ASPNETCORE_URLS='http://localhost:5066'" \
-            "  dotnet OxyKit.Render.Api.dll" \
-            "" \
-            "Docs: https://oxykit.dev" \
-            > ./publish/app/README.txt
-          APP_ZIP="OxyKit.Render.Api-${VERSION}-dotnet.zip"
-          (cd publish/app && zip -r "../../${APP_ZIP}" .)
-          echo "APP_ZIP=${APP_ZIP}" >> "$GITHUB_ENV"
+          mkdir -p dist
+          for rid in linux-x64 win-x64 osx-arm64; do
+            out="publish/${rid}"
+            rm -rf "${out}"
+            dotnet publish src/OxyKit.Render.Api/OxyKit.Render.Api.csproj \
+              -c Release \
+              -r "${rid}" \
+              --self-contained false \
+              -p:UseAppHost=true \
+              -o "${out}"
+            rm -f "${out}/appsettings.Development.json"
+            printf '%s\n' \
+              "OxyKit.Render.Api ${VERSION} (${rid})" \
+              "" \
+              "Requires the .NET 10 runtime for this OS:" \
+              "  https://dotnet.microsoft.com/download/dotnet/10.0" \
+              "" \
+              "Set an API key (required in Production), then run:" \
+              "" \
+              "  # Linux / macOS" \
+              "  export Security__ApiKey='your-key'" \
+              "  export ASPNETCORE_URLS='http://localhost:5066'" \
+              "  ./OxyKit.Render.Api" \
+              "" \
+              "  # Windows (PowerShell)" \
+              "  \$env:Security__ApiKey='your-key'" \
+              "  \$env:ASPNETCORE_URLS='http://localhost:5066'" \
+              "  .\\OxyKit.Render.Api.exe" \
+              "" \
+              "Docs: https://oxykit.dev" \
+              > "${out}/README.txt"
+            zip_name="OxyKit.Render.Api-${VERSION}-${rid}.zip"
+            (cd "${out}" && zip -r "../../dist/${zip_name}" .)
+          done
 
       - name: GitHub Release
         uses: softprops/action-gh-release@v2
@@ -115,6 +125,6 @@ jobs:
           generate_release_notes: true
           files: |
             ${{ env.NUGET_ZIP }}
-            ${{ env.APP_ZIP }}
+            dist/*.zip
             artifacts/*.nupkg
             artifacts/*.snupkg

@@ -41,6 +41,6 @@ Core is not packable.
 First release: versions are already `0.1.0` — after setup, `git tag v0.1.0 && git push origin v0.1.0`.
 
 The workflow also creates a **GitHub Release** for the tag with:
-- `OxyKit.Render.Api-{version}-dotnet.zip` — runnable host (framework-dependent; needs .NET 10 runtime; `dotnet OxyKit.Render.Api.dll`)
+- `OxyKit.Render.Api-{version}-{linux-x64|win-x64|osx-arm64}.zip` — runnable host per OS (framework-dependent; needs .NET 10 runtime)
 - `OxyKit.Render.Client-{version}-nuget.zip` — Client + Contracts `.nupkg` / `.snupkg`
 - individual NuGet package files as assets
