@@ -6,7 +6,7 @@
     <RootNamespace>OxyKit.Render.Client</RootNamespace>
     <Description>Typed HttpClient SDK for OxyKit.Render Local and Cloud APIs.</Description>
     <PackageId>OxyKit.Render.Client</PackageId>
-    <Version>0.1.2</Version>
+    <Version>0.1.3</Version>
     <Authors>OxyKit.Render</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://oxykit.dev</PackageProjectUrl>
