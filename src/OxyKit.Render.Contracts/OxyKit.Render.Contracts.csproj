@@ -13,10 +13,12 @@
     <RepositoryUrl>https://github.com/oxykit-dev/OxyKit.Render</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>oxykit;render;contracts</PackageTags>
+    <PackageIcon>images/icon.png</PackageIcon>
     <IsPackable>true</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>
     <None Include="..\..\docs\nuget\OxyKit.Render.Contracts.md" Pack="true" PackagePath="README.md" />
+    <None Include="..\..\docs\nuget\icon.png" Pack="true" PackagePath="images/" />
   </ItemGroup>
 </Project>

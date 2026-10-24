@@ -13,11 +13,13 @@
     <RepositoryUrl>https://github.com/oxykit-dev/OxyKit.Render</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>oxykit;render;pdf;httpclient</PackageTags>
+    <PackageIcon>images/icon.png</PackageIcon>
     <IsPackable>true</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>
     <None Include="..\..\docs\nuget\OxyKit.Render.Client.md" Pack="true" PackagePath="README.md" />
+    <None Include="..\..\docs\nuget\icon.png" Pack="true" PackagePath="images/" />
   </ItemGroup>
 
   <ItemGroup>
