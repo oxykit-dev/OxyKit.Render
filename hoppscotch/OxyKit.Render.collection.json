@@ -2,7 +2,7 @@
   "v": 12,
   "name": "OxyKit.Render",
   "variables": [],
-  "description": "Local smoke tests for OxyKit.Render render API (html/csv/table/template \u2192 pdf/xlsx/csv/html). Import with OxyKit.Render.environment.json, then Run collection.",
+  "description": "Local smoke tests for OxyKit.Render render API (html/csv/table/template → pdf/xlsx/csv/html). Import with OxyKit.Render.environment.json, then Run collection.",
   "folders": [
     {
       "v": 12,
@@ -31,12 +31,12 @@
           },
           "requestVariables": [],
           "responses": {},
-          "description": "Liveness check \u2014 no API key required."
+          "description": "Liveness check — no API key required."
         },
         {
           "v": "17",
           "id": "pf-formats-unauthorized",
-          "name": "GET /formats without API key \u2192 401",
+          "name": "GET /formats without API key → 401",
           "method": "GET",
           "endpoint": "<<baseUrl>>/formats",
           "params": [],
@@ -97,7 +97,7 @@
       "v": 12,
       "name": "Templates",
       "variables": [],
-      "description": "On-disk Scriban templates (sample: invoice) \u2192 HTML preview or PDF.",
+      "description": "On-disk Scriban templates (starter: invoice) → HTML preview or PDF.",
       "folders": [],
       "requests": [
         {
@@ -120,34 +120,34 @@
           },
           "requestVariables": [],
           "responses": {},
-          "description": "Lists on-disk template ids and whether each has a contract.json."
+          "description": "Lists on-disk template ids and whether each has a contract.json (sample starter: invoice)."
         },
         {
           "v": "17",
           "id": "pf-template-html-ok",
-          "name": "Render template \u2192 HTML",
+          "name": "Render template → HTML",
           "method": "POST",
           "endpoint": "<<baseUrl>>/render/template/html",
           "params": [],
           "headers": [],
           "preRequestScript": "",
-          "testScript": "pw.test(\"status is 200\", () => {\n  pw.expect(pw.response.status).toBe(200);\n});\npw.test(\"content-type includes text/html\", () => {\n  const ct = pw.response.headers[\"content-type\"] || \"\";\n  pw.expect(ct.toLowerCase().includes(\"text/html\")).toBe(true);\n});\npw.test(\"renders invoice fields\", () => {\n  const text = typeof pw.response.body === \"string\"\n    ? pw.response.body\n    : String(pw.response.body);\n  pw.expect(text.includes(\"INV-1001\")).toBe(true);\n  pw.expect(text.includes(\"Acme Corp\")).toBe(true);\n  pw.expect(text.includes(\"Widget\")).toBe(true);\n  pw.expect(text.includes(\"pf-document\")).toBe(true);\n});\n",
+          "testScript": "pw.test(\"status is 200\", () => {\n  pw.expect(pw.response.status).toBe(200);\n});\npw.test(\"content-type includes text/html\", () => {\n  const ct = pw.response.headers[\"content-type\"] || \"\";\n  pw.expect(ct.toLowerCase().includes(\"text/html\")).toBe(true);\n});\npw.test(\"renders invoice fields\", () => {\n  const text = typeof pw.response.body === \"string\"\n    ? pw.response.body\n    : String(pw.response.body);\n  pw.expect(text.includes(\"INV-2026-0042\")).toBe(true);\n  pw.expect(text.includes(\"Acme Corp\")).toBe(true);\n  pw.expect(text.includes(\"Widget\")).toBe(true);\n  pw.expect(text.includes(\"pf-document\")).toBe(true);\n});\n",
           "auth": {
             "authType": "inherit",
             "authActive": true
           },
           "body": {
             "contentType": "application/json",
-            "body": "{\n  \"templateId\": \"invoice\",\n  \"data\": {\n    \"invoiceNumber\": \"INV-1001\",\n    \"customerName\": \"Acme Corp\",\n    \"total\": 250,\n    \"lines\": [\n      {\n        \"description\": \"Widget\",\n        \"amount\": 100\n      },\n      {\n        \"description\": \"Service\",\n        \"amount\": 150\n      }\n    ]\n  }\n}"
+            "body": "{\n  \"templateId\": \"invoice\",\n  \"data\": {\n    \"invoiceNumber\": \"INV-2026-0042\",\n    \"issuerName\": \"Northwind Supplies\",\n    \"issuerAddress\": \"120 Market Street\\nSeattle, WA 98101\",\n    \"customerName\": \"Acme Corp\",\n    \"customerAddress\": \"88 Harbor Road\\nPortland, OR 97201\",\n    \"issueDate\": \"2026-11-04\",\n    \"dueDate\": \"2026-11-18\",\n    \"paidAt\": \"2026-11-04T15:30:00\",\n    \"currency\": \"USD\",\n    \"culture\": \"en-US\",\n    \"taxRate\": 0.08,\n    \"subtotal\": 1359.0,\n    \"tax\": 108.72,\n    \"fxRate\": 1.0847,\n    \"total\": 1467.72,\n    \"notes\": \"Payment due within 14 days. Compact Hoppscotch sample (10 lines); use templates/invoice/sample-data.json for the full multi-page set.\",\n    \"lines\": [\n      {\n        \"description\": \"Widget A \\u2014 stock SKU W-100\",\n        \"quantity\": 10,\n        \"unitPrice\": 12.0,\n        \"amount\": 120.0\n      },\n      {\n        \"description\": \"Widget B \\u2014 stock SKU W-200\",\n        \"quantity\": 8,\n        \"unitPrice\": 15.5,\n        \"amount\": 124.0\n      },\n      {\n        \"description\": \"Widget C \\u2014 stock SKU W-300\",\n        \"quantity\": 5,\n        \"unitPrice\": 22.0,\n        \"amount\": 110.0\n      },\n      {\n        \"description\": \"Cable harness \\u2014 2m\",\n        \"quantity\": 20,\n        \"unitPrice\": 4.25,\n        \"amount\": 85.0\n      },\n      {\n        \"description\": \"Mounting bracket set\",\n        \"quantity\": 12,\n        \"unitPrice\": 9.75,\n        \"amount\": 117.0\n      },\n      {\n        \"description\": \"Power supply 24V\",\n        \"quantity\": 6,\n        \"unitPrice\": 38.0,\n        \"amount\": 228.0\n      },\n      {\n        \"description\": \"Control board rev D\",\n        \"quantity\": 4,\n        \"unitPrice\": 65.0,\n        \"amount\": 260.0\n      },\n      {\n        \"description\": \"Sensor pack (temp/humidity)\",\n        \"quantity\": 15,\n        \"unitPrice\": 11.2,\n        \"amount\": 168.0\n      },\n      {\n        \"description\": \"Enclosure \\u2014 small\",\n        \"quantity\": 10,\n        \"unitPrice\": 7.5,\n        \"amount\": 75.0\n      },\n      {\n        \"description\": \"Enclosure \\u2014 large\",\n        \"quantity\": 4,\n        \"unitPrice\": 18.0,\n        \"amount\": 72.0\n      }\n    ]\n  }\n}"
           },
           "requestVariables": [],
           "responses": {},
-          "description": "Validates data against contract.json and returns HTML preview with inlined print baseline."
+          "description": "Validates data against contract.json and returns HTML preview with inlined print baseline. Body is a compact subset of templates/invoice/sample-data.json."
         },
         {
           "v": "17",
           "id": "pf-template-pdf-ok",
-          "name": "Render template \u2192 PDF",
+          "name": "Render template → PDF",
           "method": "POST",
           "endpoint": "<<baseUrl>>/render/template/pdf",
           "params": [],
@@ -160,16 +160,16 @@
           },
           "body": {
             "contentType": "application/json",
-            "body": "{\n  \"templateId\": \"invoice\",\n  \"data\": {\n    \"invoiceNumber\": \"INV-1001\",\n    \"customerName\": \"Acme Corp\",\n    \"total\": 250,\n    \"lines\": [\n      {\n        \"description\": \"Widget\",\n        \"amount\": 100\n      },\n      {\n        \"description\": \"Service\",\n        \"amount\": 150\n      }\n    ]\n  },\n  \"pageSize\": \"A4\",\n  \"pageOrientation\": \"Portrait\"\n}"
+            "body": "{\n  \"templateId\": \"invoice\",\n  \"data\": {\n    \"invoiceNumber\": \"INV-2026-0042\",\n    \"issuerName\": \"Northwind Supplies\",\n    \"issuerAddress\": \"120 Market Street\\nSeattle, WA 98101\",\n    \"customerName\": \"Acme Corp\",\n    \"customerAddress\": \"88 Harbor Road\\nPortland, OR 97201\",\n    \"issueDate\": \"2026-11-04\",\n    \"dueDate\": \"2026-11-18\",\n    \"paidAt\": \"2026-11-04T15:30:00\",\n    \"currency\": \"USD\",\n    \"culture\": \"en-US\",\n    \"taxRate\": 0.08,\n    \"subtotal\": 1359.0,\n    \"tax\": 108.72,\n    \"fxRate\": 1.0847,\n    \"total\": 1467.72,\n    \"notes\": \"Payment due within 14 days. Compact Hoppscotch sample (10 lines); use templates/invoice/sample-data.json for the full multi-page set.\",\n    \"lines\": [\n      {\n        \"description\": \"Widget A \\u2014 stock SKU W-100\",\n        \"quantity\": 10,\n        \"unitPrice\": 12.0,\n        \"amount\": 120.0\n      },\n      {\n        \"description\": \"Widget B \\u2014 stock SKU W-200\",\n        \"quantity\": 8,\n        \"unitPrice\": 15.5,\n        \"amount\": 124.0\n      },\n      {\n        \"description\": \"Widget C \\u2014 stock SKU W-300\",\n        \"quantity\": 5,\n        \"unitPrice\": 22.0,\n        \"amount\": 110.0\n      },\n      {\n        \"description\": \"Cable harness \\u2014 2m\",\n        \"quantity\": 20,\n        \"unitPrice\": 4.25,\n        \"amount\": 85.0\n      },\n      {\n        \"description\": \"Mounting bracket set\",\n        \"quantity\": 12,\n        \"unitPrice\": 9.75,\n        \"amount\": 117.0\n      },\n      {\n        \"description\": \"Power supply 24V\",\n        \"quantity\": 6,\n        \"unitPrice\": 38.0,\n        \"amount\": 228.0\n      },\n      {\n        \"description\": \"Control board rev D\",\n        \"quantity\": 4,\n        \"unitPrice\": 65.0,\n        \"amount\": 260.0\n      },\n      {\n        \"description\": \"Sensor pack (temp/humidity)\",\n        \"quantity\": 15,\n        \"unitPrice\": 11.2,\n        \"amount\": 168.0\n      },\n      {\n        \"description\": \"Enclosure \\u2014 small\",\n        \"quantity\": 10,\n        \"unitPrice\": 7.5,\n        \"amount\": 75.0\n      },\n      {\n        \"description\": \"Enclosure \\u2014 large\",\n        \"quantity\": 4,\n        \"unitPrice\": 18.0,\n        \"amount\": 72.0\n      }\n    ]\n  },\n  \"pageSize\": \"A4\",\n  \"pageOrientation\": \"Portrait\"\n}"
           },
           "requestVariables": [],
           "responses": {},
-          "description": "Same as HTML render, then PeachPDF."
+          "description": "Same as HTML render, then PeachPDF. Body is a compact subset of templates/invoice/sample-data.json."
         },
         {
           "v": "17",
           "id": "pf-template-pdf-invalid-data",
-          "name": "Invalid data \u2192 400",
+          "name": "Invalid data → 400",
           "method": "POST",
           "endpoint": "<<baseUrl>>/render/template/pdf",
           "params": [],
@@ -191,7 +191,7 @@
         {
           "v": "17",
           "id": "pf-template-html-extra-props",
-          "name": "Additional properties \u2192 400",
+          "name": "Additional properties → 400",
           "method": "POST",
           "endpoint": "<<baseUrl>>/render/template/html",
           "params": [],
@@ -213,7 +213,7 @@
         {
           "v": "17",
           "id": "pf-template-pdf-unknown",
-          "name": "Unknown template \u2192 400",
+          "name": "Unknown template → 400",
           "method": "POST",
           "endpoint": "<<baseUrl>>/render/template/pdf",
           "params": [],
@@ -250,7 +250,7 @@
     },
     {
       "v": 12,
-      "name": "HTML \u2192 PDF",
+      "name": "HTML → PDF",
       "variables": [],
       "description": null,
       "folders": [],
@@ -258,7 +258,7 @@
         {
           "v": "17",
           "id": "pf-html-pdf-ok",
-          "name": "Render HTML \u2192 PDF",
+          "name": "Render HTML → PDF",
           "method": "POST",
           "endpoint": "<<baseUrl>>/render/html/pdf",
           "params": [],
@@ -280,7 +280,7 @@
         {
           "v": "17",
           "id": "pf-html-pdf-missing-content",
-          "name": "Missing content \u2192 400",
+          "name": "Missing content → 400",
           "method": "POST",
           "endpoint": "<<baseUrl>>/render/html/pdf",
           "params": [],
@@ -317,15 +317,15 @@
     },
     {
       "v": 12,
-      "name": "CSV \u2192 PDF / Excel",
+      "name": "CSV → PDF / Excel",
       "variables": [],
-      "description": "RFC 4180 CSV text in content \u2192 PDF or XLSX.",
+      "description": "RFC 4180 CSV text in content → PDF or XLSX.",
       "folders": [],
       "requests": [
         {
           "v": "17",
           "id": "pf-csv-xlsx-ok",
-          "name": "Render CSV \u2192 XLSX",
+          "name": "Render CSV → XLSX",
           "method": "POST",
           "endpoint": "<<baseUrl>>/render/csv/xlsx",
           "params": [],
@@ -347,7 +347,7 @@
         {
           "v": "17",
           "id": "pf-csv-pdf-ok",
-          "name": "Render CSV \u2192 PDF",
+          "name": "Render CSV → PDF",
           "method": "POST",
           "endpoint": "<<baseUrl>>/render/csv/pdf",
           "params": [],
@@ -369,7 +369,7 @@
         {
           "v": "17",
           "id": "pf-csv-xlsx-missing",
-          "name": "Missing content \u2192 400",
+          "name": "Missing content → 400",
           "method": "POST",
           "endpoint": "<<baseUrl>>/render/csv/xlsx",
           "params": [],
@@ -406,7 +406,7 @@
     },
     {
       "v": 12,
-      "name": "Table \u2192 HTML",
+      "name": "Table → HTML",
       "variables": [],
       "description": "Standalone HTML preview using the shared print baseline stylesheet.",
       "folders": [],
@@ -414,7 +414,7 @@
         {
           "v": "17",
           "id": "pf-table-html-ok",
-          "name": "Render table \u2192 HTML",
+          "name": "Render table → HTML",
           "method": "POST",
           "endpoint": "<<baseUrl>>/render/table/html",
           "params": [],
@@ -451,7 +451,7 @@
     },
     {
       "v": 12,
-      "name": "Table \u2192 PDF",
+      "name": "Table → PDF",
       "variables": [],
       "description": null,
       "folders": [],
@@ -459,7 +459,7 @@
         {
           "v": "17",
           "id": "pf-table-pdf-ok",
-          "name": "Render table \u2192 PDF",
+          "name": "Render table → PDF",
           "method": "POST",
           "endpoint": "<<baseUrl>>/render/table/pdf",
           "params": [],
@@ -496,7 +496,7 @@
     },
     {
       "v": 12,
-      "name": "Table \u2192 Excel",
+      "name": "Table → Excel",
       "variables": [],
       "description": "Excel export including ISO date coercion and validation failures.",
       "folders": [],
@@ -504,7 +504,7 @@
         {
           "v": "17",
           "id": "pf-table-xlsx-ok",
-          "name": "Render table \u2192 XLSX",
+          "name": "Render table → XLSX",
           "method": "POST",
           "endpoint": "<<baseUrl>>/render/table/xlsx",
           "params": [],
@@ -548,7 +548,7 @@
         {
           "v": "17",
           "id": "pf-table-xlsx-object-cell",
-          "name": "Object cell \u2192 400",
+          "name": "Object cell → 400",
           "method": "POST",
           "endpoint": "<<baseUrl>>/render/table/xlsx",
           "params": [],
@@ -570,7 +570,7 @@
         {
           "v": "17",
           "id": "pf-table-xlsx-ragged",
-          "name": "Ragged rows \u2192 400",
+          "name": "Ragged rows → 400",
           "method": "POST",
           "endpoint": "<<baseUrl>>/render/table/xlsx",
           "params": [],
@@ -607,7 +607,7 @@
     },
     {
       "v": 12,
-      "name": "Table \u2192 CSV",
+      "name": "Table → CSV",
       "variables": [],
       "description": null,
       "folders": [],
@@ -615,7 +615,7 @@
         {
           "v": "17",
           "id": "pf-table-csv-ok",
-          "name": "Render table \u2192 CSV",
+          "name": "Render table → CSV",
           "method": "POST",
           "endpoint": "<<baseUrl>>/render/table/csv",
           "params": [],
@@ -659,7 +659,7 @@
         {
           "v": "17",
           "id": "pf-table-csv-multi-sheet",
-          "name": "Multiple sheets \u2192 400",
+          "name": "Multiple sheets → 400",
           "method": "POST",
           "endpoint": "<<baseUrl>>/render/table/csv",
           "params": [],
