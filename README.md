@@ -23,6 +23,7 @@ dotnet run --project src/OxyKit.Render.Api
 | `http://localhost:5066` | API |
 | `X-OxyKit-Render-Key: dev-local-key` | Dev API key (`appsettings.Development.json`) |
 | `GET /health` | Anonymous |
+| `X-Correlation-Id` | Optional; echoed on every response (generated if omitted) |
 | `/scalar`, `/openapi/v1.json` | OpenAPI UI + JSON (Development only) |
 | `/formats`, `/templates`, `/render/{input}/{output}` | Authenticated (+ `/v1/...` aliases) |
 
@@ -32,6 +33,8 @@ dotnet test tests/OxyKit.Render.Client.Tests/OxyKit.Render.Client.Tests.csproj
 ```
 
 **Smoke:** import [`hoppscotch/`](./hoppscotch/) collection + env → **OxyKit.Render Local** → run folders in order.
+
+Observability: shared [`OxyKit.Observability`](../OxyKit.Observability/) (JSON stdout + correlation; **no** `OxyKit.OpenTelemetry` on Render). Docs: [oxykit.dev/guide/observability](https://oxykit.dev/guide/observability).
 
 ```bash
 curl -X POST "http://localhost:5066/render/table/html" \

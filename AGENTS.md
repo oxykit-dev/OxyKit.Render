@@ -98,9 +98,16 @@ dotnet test tests/OxyKit.Render.Client.Tests/OxyKit.Render.Client.Tests.csproj
 Dev key: `X-OxyKit-Render-Key: dev-local-key`.  
 Hoppscotch: import `hoppscotch/*`, env **OxyKit.Render Local**, run folders in order.
 
+## Observability
+
+Shared lib (suite ProjectReference): `OxyKit.Observability` only — see [`../OxyKit.Observability/AGENTS.md`](../OxyKit.Observability/AGENTS.md).
+
+- `AddOxyKitJsonConsole` + `UseOxyKitCorrelation`
+- **Do not** reference `OxyKit.OpenTelemetry` (AOT/size)
+
 ## Config knobs
 
-`Security:RequireLocalRequests`, `ApiKeyHeader`, `ApiKey` (startup fails if missing / `change-me-in-production`); `Rendering:MaxHtmlContentChars`, `MaxCsvContentChars`, `MaxRequestBodyBytes`, `MaxConcurrentRenders`, `TemplatesRoot`, `MaxTemplateChars`, `MaxContractChars`. Templates on disk: `templates/{id}/template.html` + `contract.json`. Table/CSV limits: `TableWorkbookConstraints`.
+`Security:RequireLocalRequests`, `ApiKeyHeader`, `ApiKey` (startup fails if missing / `change-me-in-production`); `Rendering:MaxHtmlContentChars`, `MaxCsvContentChars`, `MaxRequestBodyBytes`, `MaxConcurrentRenders`, `TemplatesRoot`, `MaxTemplateChars`, `MaxContractChars`; `Logging:JsonConsole`. Templates on disk: `templates/{id}/template.html` + `contract.json`. Table/CSV limits: `TableWorkbookConstraints`.
 
 ## Docs policy for agents
 

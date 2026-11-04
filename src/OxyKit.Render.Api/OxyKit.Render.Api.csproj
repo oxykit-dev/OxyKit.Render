@@ -21,6 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\OxyKit.Observability\src\OxyKit.Observability\OxyKit.Observability.csproj" />
     <ProjectReference Include="..\OxyKit.Render.Core\OxyKit.Render.Core.csproj" />
     <ProjectReference Include="..\OxyKit.Render.Contracts\OxyKit.Render.Contracts.csproj" />
   </ItemGroup>

@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using OxyKit.Observability;
 using OxyKit.Render.Api.Endpoints;
 using OxyKit.Render.Api.OpenApi;
 using OxyKit.Render.Api.Security;
@@ -6,6 +7,7 @@ using OxyKit.Render.Core;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.AddOxyKitJsonConsole();
 
 builder.Services.ConfigureHttpJsonOptions(options =>
 {
@@ -53,6 +55,7 @@ builder.Services.AddRenderOpenApi();
 
 var app = builder.Build();
 
+app.UseOxyKitCorrelation();
 app.UseMiddleware<InternalAccessMiddleware>();
 
 // Suite OpenAPI convention: JSON + Scalar in Development only.
