@@ -3,6 +3,9 @@
 ##
 ## Get latest from `dotnet new gitignore`
 
+# Local render smoke (HTML/PDF) — not source
+/output/
+
 # dotenv files
 .env
 
