@@ -64,7 +64,7 @@ OpenAPI (Development only, anon): `/openapi/v1.json` + Scalar `/scalar` (suite c
 | `barcode symbology payload` | Inline SVG | Barcoder (MIT). Symbologies: `code128`, `code39`, `ean13`. 1D uses `width="100%"` + viewBox (fills content). Optional `height:` (bar aspect px), `pixels:` (multi-row only). Custom SVG — no ImageSharp/SvgLib |
 
 Trusted template markup only — `data` strings stay HTML-escaped on import; helper output is Core-generated. Pins: `qrcoder@`, `barcoder@` in `EngineIdentity`.  
-**Golden sample:** `templates/invoice/` — canonical print doc (`.pf-header` / parties / `.pf-marks` / lines / `.pf-footer`); barcode box ~70mm; shared chrome classes live in `print-baseline.css`.
+**Starter template:** `templates/invoice/` — document chrome in the body, page chrome via `@page`, ~70mm barcode strip; shared classes in `print-baseline.css`. Print CSS refs: MDN [`@page`](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/At-rules/@page) + [paged media](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_paged_media); engine: [PeachPDF HTML/CSS support](https://peachpdf.net/html-css-support.html).
 
 ## Add a transform (checklist)
 

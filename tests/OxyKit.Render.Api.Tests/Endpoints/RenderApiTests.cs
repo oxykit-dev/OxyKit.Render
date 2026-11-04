@@ -552,6 +552,9 @@ public sealed class RenderApiTests(WebApplicationFactory<Program> factory)
         Assert.Contains("class=\"pf-footer\"", html);
         Assert.Contains("class=\"pf-qr\"", html);
         Assert.Contains("class=\"pf-barcode\"", html);
+        Assert.Contains("counter(page)", html);
+        Assert.Contains("counter(pages)", html);
+        Assert.Contains("string-set:", html);
         Assert.Contains("<svg ", html);
         Assert.DoesNotContain("data:image/png", html);
 
