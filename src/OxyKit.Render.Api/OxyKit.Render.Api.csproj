@@ -13,6 +13,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.13" />
     <PackageReference Include="Microsoft.OpenApi" Version="2.12.2" />
+    <PackageReference Include="OxyKit.Observability" Version="0.1.1" />
     <PackageReference Include="Scalar.AspNetCore" Version="2.18.0" />
   </ItemGroup>
 
@@ -21,7 +22,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\OxyKit.Observability\src\OxyKit.Observability\OxyKit.Observability.csproj" />
     <ProjectReference Include="..\OxyKit.Render.Core\OxyKit.Render.Core.csproj" />
     <ProjectReference Include="..\OxyKit.Render.Contracts\OxyKit.Render.Contracts.csproj" />
   </ItemGroup>

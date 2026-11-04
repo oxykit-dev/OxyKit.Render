@@ -6,7 +6,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
-- Observability via suite `OxyKit.Observability` (JSON console + `X-Correlation-Id`; no OTel package)
+- Observability via NuGet `OxyKit.Observability` (JSON console + `X-Correlation-Id`; no OTel package)
 
 ## [0.1.0] - 2026-10-22
 

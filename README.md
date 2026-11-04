@@ -34,7 +34,7 @@ dotnet test tests/OxyKit.Render.Client.Tests/OxyKit.Render.Client.Tests.csproj
 
 **Smoke:** import [`hoppscotch/`](./hoppscotch/) collection + env → **OxyKit.Render Local** → run folders in order.
 
-Observability: shared [`OxyKit.Observability`](../OxyKit.Observability/) (JSON stdout + correlation; **no** `OxyKit.OpenTelemetry` on Render). Docs: [oxykit.dev/guide/observability](https://oxykit.dev/guide/observability).
+Observability: NuGet [`OxyKit.Observability`](https://www.nuget.org/packages/OxyKit.Observability) (JSON stdout + correlation; **no** `OxyKit.OpenTelemetry` on Render). Docs: [oxykit.dev/guide/observability](https://oxykit.dev/guide/observability).
 
 ```bash
 curl -X POST "http://localhost:5066/render/table/html" \

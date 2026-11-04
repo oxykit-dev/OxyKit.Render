@@ -100,7 +100,7 @@ Hoppscotch: import `hoppscotch/*`, env **OxyKit.Render Local**, run folders in o
 
 ## Observability
 
-Shared lib (suite ProjectReference): `OxyKit.Observability` only — see [`../OxyKit.Observability/AGENTS.md`](../OxyKit.Observability/AGENTS.md).
+Shared lib (NuGet): `OxyKit.Observability` only — see [Observability AGENTS](https://github.com/oxykit-dev/OxyKit.Observability/blob/master/AGENTS.md).
 
 - `AddOxyKitJsonConsole` + `UseOxyKitCorrelation`
 - **Do not** reference `OxyKit.OpenTelemetry` (AOT/size)
