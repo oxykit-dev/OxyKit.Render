@@ -1,0 +1,200 @@
+{
+  "invoiceNumber": "INV-2026-0042",
+  "issuerName": "Northwind Supplies",
+  "issuerAddress": "120 Market Street\nSeattle, WA 98101",
+  "customerName": "Acme Corp",
+  "customerAddress": "88 Harbor Road\nPortland, OR 97201",
+  "issueDate": "2026-11-04",
+  "dueDate": "2026-11-18",
+  "paidAt": "2026-11-04T15:30:00",
+  "currency": "USD",
+  "culture": "en-US",
+  "taxRate": 0.08,
+  "subtotal": 2308.0,
+  "tax": 184.64,
+  "fxRate": 1.0847,
+  "total": 2492.64,
+  "notes": "Payment due within 14 days. This sample spans multiple pages so PDF page headers/footers and page numbers are easy to check.",
+  "lines": [
+    {
+      "description": "Widget A \u2014 stock SKU W-100",
+      "quantity": 10,
+      "unitPrice": 12.0,
+      "amount": 120.0
+    },
+    {
+      "description": "Widget B \u2014 stock SKU W-200",
+      "quantity": 8,
+      "unitPrice": 15.5,
+      "amount": 124.0
+    },
+    {
+      "description": "Widget C \u2014 stock SKU W-300",
+      "quantity": 5,
+      "unitPrice": 22.0,
+      "amount": 110.0
+    },
+    {
+      "description": "Cable harness \u2014 2m",
+      "quantity": 20,
+      "unitPrice": 4.25,
+      "amount": 85.0
+    },
+    {
+      "description": "Mounting bracket set",
+      "quantity": 12,
+      "unitPrice": 9.75,
+      "amount": 117.0
+    },
+    {
+      "description": "Power supply 24V",
+      "quantity": 6,
+      "unitPrice": 38.0,
+      "amount": 228.0
+    },
+    {
+      "description": "Control board rev D",
+      "quantity": 4,
+      "unitPrice": 65.0,
+      "amount": 260.0
+    },
+    {
+      "description": "Sensor pack (temp/humidity)",
+      "quantity": 15,
+      "unitPrice": 11.2,
+      "amount": 168.0
+    },
+    {
+      "description": "Enclosure \u2014 small",
+      "quantity": 10,
+      "unitPrice": 7.5,
+      "amount": 75.0
+    },
+    {
+      "description": "Enclosure \u2014 large",
+      "quantity": 4,
+      "unitPrice": 18.0,
+      "amount": 72.0
+    },
+    {
+      "description": "Fastener kit M3",
+      "quantity": 25,
+      "unitPrice": 1.6,
+      "amount": 40.0
+    },
+    {
+      "description": "Fastener kit M4",
+      "quantity": 25,
+      "unitPrice": 1.8,
+      "amount": 45.0
+    },
+    {
+      "description": "Label roll \u2014 thermal",
+      "quantity": 3,
+      "unitPrice": 14.0,
+      "amount": 42.0
+    },
+    {
+      "description": "Shipping carton \u2014 medium",
+      "quantity": 10,
+      "unitPrice": 3.2,
+      "amount": 32.0
+    },
+    {
+      "description": "Foam insert pack",
+      "quantity": 10,
+      "unitPrice": 2.4,
+      "amount": 24.0
+    },
+    {
+      "description": "Assembly labor \u2014 bench",
+      "quantity": 6,
+      "unitPrice": 45.0,
+      "amount": 270.0
+    },
+    {
+      "description": "QA inspection \u2014 lot",
+      "quantity": 2,
+      "unitPrice": 55.0,
+      "amount": 110.0
+    },
+    {
+      "description": "Firmware flash & test",
+      "quantity": 4,
+      "unitPrice": 28.0,
+      "amount": 112.0
+    },
+    {
+      "description": "Support retainer \u2014 month",
+      "quantity": 1,
+      "unitPrice": 80.0,
+      "amount": 80.0
+    },
+    {
+      "description": "Expedite handling",
+      "quantity": 1,
+      "unitPrice": 35.0,
+      "amount": 35.0
+    },
+    {
+      "description": "Documentation pack (PDF)",
+      "quantity": 1,
+      "unitPrice": 25.0,
+      "amount": 25.0
+    },
+    {
+      "description": "Spare fuse assortment",
+      "quantity": 8,
+      "unitPrice": 3.5,
+      "amount": 28.0
+    },
+    {
+      "description": "Grounding strap",
+      "quantity": 10,
+      "unitPrice": 2.1,
+      "amount": 21.0
+    },
+    {
+      "description": "DIN rail clip",
+      "quantity": 16,
+      "unitPrice": 1.25,
+      "amount": 20.0
+    },
+    {
+      "description": "Terminal block 8-pos",
+      "quantity": 12,
+      "unitPrice": 4.75,
+      "amount": 57.0
+    },
+    {
+      "description": "Ribbon cable 40-pin",
+      "quantity": 8,
+      "unitPrice": 6.5,
+      "amount": 52.0
+    },
+    {
+      "description": "Heat-shrink assortment",
+      "quantity": 5,
+      "unitPrice": 9.0,
+      "amount": 45.0
+    },
+    {
+      "description": "Calibration certificate",
+      "quantity": 2,
+      "unitPrice": 18.0,
+      "amount": 36.0
+    },
+    {
+      "description": "On-site commissioning credit",
+      "quantity": 1,
+      "unitPrice": -50.0,
+      "amount": -50.0
+    },
+    {
+      "description": "Volume discount",
+      "quantity": 1,
+      "unitPrice": -75.0,
+      "amount": -75.0
+    }
+  ]
+}

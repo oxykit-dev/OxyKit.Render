@@ -4,7 +4,12 @@ using Microsoft.Extensions.Options;
 
 namespace OxyKit.Render.Core.Inputs;
 
-internal sealed record TemplateDefinition(string Id, string Html, string ContractJson);
+internal sealed record TemplateDefinition(
+    string Id,
+    string Html,
+    string ContractJson,
+    string Directory
+);
 
 internal sealed record TemplateInfo(string Id, bool HasContract);
 
@@ -85,7 +90,7 @@ internal sealed partial class TemplateStore
             );
         }
 
-        return new TemplateDefinition(id, html, contractJson);
+        return new TemplateDefinition(id, html, contractJson, dir);
     }
 
     private static string ResolveRoot(string configured, string contentRoot)

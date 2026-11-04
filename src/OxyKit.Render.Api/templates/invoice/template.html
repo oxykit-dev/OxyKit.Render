@@ -5,6 +5,8 @@
   <title>Invoice {{ invoiceNumber }}</title>
   <!--
     Starter invoice — copy and adapt.
+    Shows helpers: qr, barcode, money, number, percent, date, datetime, asset;
+    and include for partials (e.g. partials/doc-footer.html).
     Document header/footer: .pf-header / .pf-footer (once in the body).
     Page header/footer: @page margin boxes + string-set / counter(page|pages) in the PDF.
     See MDN @page and CSS paged media; PeachPDF HTML/CSS support for engine coverage.
@@ -12,7 +14,6 @@
     Print baseline is inlined by OxyKit.Render before this <style>.
   -->
   <style>
-    /* Page chrome (repeating). Extra margin leaves room for margin boxes. */
     @page {
       size: A4;
       margin: 22mm 16mm 24mm;
@@ -43,7 +44,14 @@
       }
     }
 
-    /* Feed margin boxes from visible document content. */
+    body.pf-document .pf-brand-logo {
+      margin: 0 0 8px;
+    }
+    body.pf-document .pf-brand-logo img {
+      display: block;
+      height: 10mm;
+      width: auto;
+    }
     body.pf-document .pf-brand-name {
       margin: 0;
       font-size: 16pt;
@@ -101,7 +109,6 @@
       font-size: 11pt;
       font-weight: 600;
     }
-    /* Marks on their own row so ~70mm barcode stays on-page. */
     body.pf-document .pf-marks {
       width: auto;
       max-width: 100%;
@@ -133,17 +140,28 @@
       color: #555;
       letter-spacing: 0.02em;
     }
-    body.pf-document .pf-lines th:last-child,
-    body.pf-document .pf-lines td:last-child {
-      width: 28%;
+    body.pf-document .pf-lines th.pf-num,
+    body.pf-document .pf-lines td.pf-num {
+      width: 18%;
     }
     body.pf-document .pf-totals {
-      margin-top: 8px;
-      text-align: right;
+      margin-top: 12px;
+      width: 55%;
+      margin-left: auto;
     }
-    body.pf-document .pf-totals .pf-total {
-      margin: 0;
+    body.pf-document .pf-totals table.pf-layout td {
+      padding: 3px 0 !important;
+      font-size: 10.5pt;
+    }
+    body.pf-document .pf-totals table.pf-layout td:last-child {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+    body.pf-document .pf-totals .pf-total td {
       font-size: 13pt;
+      font-weight: 600;
+      padding-top: 8px !important;
+      border-top: 1px solid #c8c8c8;
     }
     body.pf-document .pf-notes {
       margin-top: 16px;
@@ -153,15 +171,20 @@
     body.pf-document .pf-preline {
       white-space: pre-line;
     }
+    body.pf-document .pf-helper-note {
+      margin: 12px 0 0;
+      color: #777;
+      font-size: 8pt;
+    }
   </style>
 </head>
 <body class="pf-document">
 
-  <!-- Document header (once, first page flow) -->
   <header class="pf-header">
     <table class="pf-layout">
       <tr>
         <td>
+          <div class="pf-brand-logo">{{ asset "assets/logo.svg" height: "10mm" alt: "Logo" }}</div>
           <p class="pf-kicker">From</p>
           <p class="pf-brand-name">{{ if issuerName; issuerName; else; "OxyKit Demo"; end }}</p>
           {{ if issuerAddress }}
@@ -174,10 +197,13 @@
             <dt>Number</dt>
             <dd><span class="pf-running-id">{{ invoiceNumber }}</span></dd>
             {{ if issueDate }}
-            <dt>Issued</dt><dd>{{ issueDate }}</dd>
+            <dt>Issued</dt><dd>{{ date issueDate culture: culture }}</dd>
             {{ end }}
             {{ if dueDate }}
-            <dt>Due</dt><dd>{{ dueDate }}</dd>
+            <dt>Due</dt><dd>{{ date dueDate format: "long" culture: culture }}</dd>
+            {{ end }}
+            {{ if paidAt }}
+            <dt>Paid</dt><dd>{{ datetime paidAt culture: culture }}</dd>
             {{ end }}
           </dl>
         </td>
@@ -199,13 +225,13 @@
         <td>
           <div class="pf-qr">
             {{ qr invoiceNumber pixels: 4 }}
-            <p class="pf-mark-caption">Scan invoice</p>
+            <p class="pf-mark-caption">Scan invoice (qr)</p>
           </div>
         </td>
         <td>
           <div class="pf-barcode">
             {{ barcode "code128" invoiceNumber height: 36 }}
-            <p class="pf-mark-caption">{{ invoiceNumber }}</p>
+            <p class="pf-mark-caption">{{ invoiceNumber }} (barcode)</p>
           </div>
         </td>
       </tr>
@@ -218,33 +244,77 @@
       <thead>
         <tr>
           <th>Description</th>
-          <th class="pf-num">Amount{{ if currency }} ({{ currency }}){{ end }}</th>
+          <th class="pf-num">Qty</th>
+          <th class="pf-num">Unit</th>
+          <th class="pf-num">Amount</th>
         </tr>
       </thead>
       <tbody>
       {{ for line in lines }}
         <tr>
           <td>{{ line.description }}</td>
-          <td class="pf-num">{{ line.amount }}</td>
+          <td class="pf-num">
+            {{ if line.quantity }}{{ number line.quantity decimals: 0 culture: culture }}{{ else }}—{{ end }}
+          </td>
+          <td class="pf-num">
+            {{ if line.unitPrice }}
+              {{ if currency }}{{ money line.unitPrice currency: currency culture: culture }}{{ else }}{{ number line.unitPrice decimals: 2 culture: culture }}{{ end }}
+            {{ else }}—{{ end }}
+          </td>
+          <td class="pf-num">
+            {{ if currency }}{{ money line.amount currency: currency culture: culture }}{{ else }}{{ number line.amount decimals: 2 culture: culture }}{{ end }}
+          </td>
         </tr>
       {{ end }}
       </tbody>
     </table>
+
     <div class="pf-totals">
-      <p class="pf-total">Total{{ if currency }} ({{ currency }}){{ end }}: {{ total }}</p>
+      <table class="pf-layout">
+        {{ if subtotal }}
+        <tr>
+          <td>Subtotal</td>
+          <td>
+            {{ if currency }}{{ money subtotal currency: currency culture: culture }}{{ else }}{{ number subtotal decimals: 2 culture: culture }}{{ end }}
+          </td>
+        </tr>
+        {{ end }}
+        {{ if taxRate }}
+        <tr>
+          <td>Tax ({{ percent taxRate decimals: 1 culture: culture }})</td>
+          <td>
+            {{ if tax }}
+              {{ if currency }}{{ money tax currency: currency culture: culture }}{{ else }}{{ number tax decimals: 2 culture: culture }}{{ end }}
+            {{ else }}—{{ end }}
+          </td>
+        </tr>
+        {{ end }}
+        {{ if fxRate }}
+        <tr>
+          <td>FX rate (number · 4 dp)</td>
+          <td>{{ number fxRate decimals: 4 culture: culture }}</td>
+        </tr>
+        {{ end }}
+        <tr class="pf-total">
+          <td>Total</td>
+          <td>
+            {{ if currency }}{{ money total currency: currency culture: culture }}{{ else }}{{ number total decimals: 2 culture: culture }}{{ end }}
+          </td>
+        </tr>
+      </table>
     </div>
+
     {{ if notes }}
     <p class="pf-notes">{{ notes }}</p>
     {{ end }}
+    <p class="pf-helper-note">
+      Helpers in this sample: qr, barcode, money, number, percent, date, datetime, asset, include.
+      {{ if issueDate }}ISO date: {{ date issueDate format: "iso" }}.{{ end }}
+      {{ if paidAt }} ISO datetime: {{ datetime paidAt format: "iso" }}.{{ end }}
+    </p>
   </section>
 
-  <!-- Document footer (once, end of flow) — terms / remittance; page # lives in @page -->
-  <footer class="pf-footer">
-    <p class="pf-muted" style="margin:0;">
-      Thank you for your business. Replace this block with remittance, VAT, or legal copy as needed.
-      Page numbers are set in the PDF page footer with <code>@page</code>.
-    </p>
-  </footer>
+  {{ include "partials/doc-footer.html" }}
 
 </body>
 </html>

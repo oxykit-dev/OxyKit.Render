@@ -11,7 +11,15 @@ namespace OxyKit.Render.Core.Inputs;
 /// </summary>
 internal static class ScribanTemplateRenderer
 {
-    public static string Render(string templateHtml, JsonElement data)
+    public static string Render(string templateHtml, JsonElement data) =>
+        Render(templateHtml, data, templateDirectory: null, options: null);
+
+    public static string Render(
+        string templateHtml,
+        JsonElement data,
+        string? templateDirectory,
+        RenderingOptions? options
+    )
     {
         Template template;
         try
@@ -38,10 +46,21 @@ internal static class ScribanTemplateRenderer
             }
         }
 
-        // Builtins last so a data field named `qr` cannot shadow the helper.
+        // Builtins last so data fields cannot shadow helpers (e.g. a property named `qr`).
+        TemplateFormatFunctions.Register(scriptObject);
         TemplateQrFunctions.Register(scriptObject);
+        TemplateAssetFunctions.Register(scriptObject);
 
         var context = new TemplateContext();
+        IDisposable? assetScope = null;
+        if (!string.IsNullOrWhiteSpace(templateDirectory))
+        {
+            var maxAsset = options?.MaxTemplateAssetBytes ?? 512_000;
+            var maxPartial = options?.MaxTemplatePartialChars ?? 200_000;
+            assetScope = TemplateAssetFunctions.BeginScope(templateDirectory, maxAsset);
+            context.TemplateLoader = new TemplateFileLoader(templateDirectory, maxPartial);
+        }
+
         context.PushGlobal(scriptObject);
 
         try
@@ -52,6 +71,10 @@ internal static class ScribanTemplateRenderer
         {
             throw new ArgumentException($"Template render failed: {Sanitize(ex.Message)}");
         }
+        finally
+        {
+            assetScope?.Dispose();
+        }
     }
 
     private static object? ToScribanValue(JsonElement element) =>
@@ -60,6 +83,7 @@ internal static class ScribanTemplateRenderer
             JsonValueKind.Object => ToScriptObject(element),
             JsonValueKind.Array => ToScriptArray(element),
             JsonValueKind.String => WebUtility.HtmlEncode(element.GetString() ?? string.Empty),
+            JsonValueKind.Number when element.TryGetDecimal(out var decimalValue) => decimalValue,
             JsonValueKind.Number when element.TryGetInt64(out var longValue) => longValue,
             JsonValueKind.Number => element.GetDouble(),
             JsonValueKind.True => true,

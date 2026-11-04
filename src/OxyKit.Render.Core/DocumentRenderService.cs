@@ -197,7 +197,7 @@ internal sealed class DocumentRenderService(
         TemplateDataValidator.Validate(template.ContractJson, payload, template.Id);
 
         var html = PrintBaselineInjector.Apply(
-            ScribanTemplateRenderer.Render(template.Html, payload)
+            ScribanTemplateRenderer.Render(template.Html, payload, template.Directory, _options)
         );
         ContentField.EnsureMaxLength(html, _options.MaxHtmlContentChars);
         return html;

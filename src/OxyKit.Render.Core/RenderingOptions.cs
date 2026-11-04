@@ -27,4 +27,10 @@ internal sealed class RenderingOptions
 
     /// <summary>Maximum size in characters for a single contract.json file.</summary>
     public int MaxContractChars { get; init; } = 100_000;
+
+    /// <summary>Maximum bytes for a single template asset (<c>asset</c> helper → data URI).</summary>
+    public int MaxTemplateAssetBytes { get; init; } = 512_000;
+
+    /// <summary>Maximum characters for a Scriban <c>include</c> partial (.html under the template folder).</summary>
+    public int MaxTemplatePartialChars { get; init; } = 200_000;
 }

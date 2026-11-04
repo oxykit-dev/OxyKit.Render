@@ -18,7 +18,7 @@ Token-efficient map. Prefer this over exploring the tree or loading the full REA
 | Request DTOs / public shapes | `OxyKit.Render.Contracts/` |
 | Typed HTTP SDK | `OxyKit.Render.Client/RenderClient.cs` |
 | Table/CSV limits & typing | `Core/Inputs/TableWorkbookConstraints.cs`, `Core/IsoDateCell.cs`, `Core/Inputs/CsvTableParser.cs` |
-| Templates | `Core/Inputs/TemplateStore.cs`, `TemplateDataValidator.cs`, `ScribanTemplateRenderer.cs`, `TemplateQrFunctions.cs`, `QrSvgEncoder.cs`, `BarcodeSvgEncoder.cs` |
+| Templates | `Core/Inputs/TemplateStore.cs`, `TemplateDataValidator.cs`, `ScribanTemplateRenderer.cs`, `TemplateQrFunctions.cs`, `TemplateFormatFunctions.cs`, `TemplateAssetFunctions.cs`, `TemplateFileLoader.cs`, `QrSvgEncoder.cs`, `BarcodeSvgEncoder.cs` |
 | PDF | `Core/Outputs/HtmlToPdfRenderer.cs`, `PdfPageOptions.cs`, `Contracts/PdfPageEnums.cs` |
 | Print CSS | `Core/assets/print-baseline.css`, `Outputs/PrintBaselineInjector.cs` |
 | Auth | `Api/Security/InternalAccessMiddleware.cs` |
@@ -62,9 +62,16 @@ OpenAPI (Development only, anon): `/openapi/v1.json` + Scalar `/scalar` (suite c
 |--------|-------|--------|
 | `qr payload` | Inline SVG | QRCoder matrix (MIT) + custom SVG. Optional `pixels:` (2–16, default 4), `ecc:` (`L`\|`M`\|`Q`\|`H`, default `M`); max 2048 UTF-8 bytes |
 | `barcode symbology payload` | Inline SVG | Barcoder (MIT). Symbologies: `code128`, `code39`, `ean13`. 1D uses `width="100%"` + viewBox (fills content). Optional `height:` (bar aspect px), `pixels:` (multi-row only). Custom SVG — no ImageSharp/SvgLib |
+| `money value` | Text | Optional `currency:` (ISO 4217), `culture:` (default `en-US`), `decimals:` (default 2). Rounds `AwayFromZero`. |
+| `number value` | Text | Optional `culture:`, `decimals:` (omit → culture default). |
+| `percent value` | Text | Fraction → percent (`0.155` → `15.5%`). Optional `culture:`, `decimals:` (default 0). |
+| `date value` | Text | ISO / date-like input. Optional `format:` (`short`\|`long`\|`iso`\|pattern), `culture:`. |
+| `datetime value` | Text | Same `format:` / `culture:` knobs as `date`. |
+| `asset path` | `<img data:…>` | File under the template folder (`png`/`jpg`/`gif`/`webp`/`svg`). Optional `width:` / `height:` / `alt:`. No `file:` or HTTP — PeachPDF data-URI only. |
+| `include "partials/….html"` | Markup | Scriban include, path-safe under the template folder (`.html` only). |
 
-Trusted template markup only — `data` strings stay HTML-escaped on import; helper output is Core-generated. Pins: `qrcoder@`, `barcoder@` in `EngineIdentity`.  
-**Starter template:** `templates/invoice/` — document chrome in the body, page chrome via `@page`, ~70mm barcode strip; shared classes in `print-baseline.css`. Print CSS refs: MDN [`@page`](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/At-rules/@page) + [paged media](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_paged_media); engine: [PeachPDF HTML/CSS support](https://peachpdf.net/html-css-support.html).
+Trusted template markup only — `data` strings stay HTML-escaped on import; helper output is Core-generated. Pins: `qrcoder@`, `barcoder@` in `EngineIdentity`. Format helpers use BCL only (fixed default culture — not host OS).  
+**Starter template:** `templates/invoice/` — logo via `asset`, footer via `include`, document/`@page` chrome, helpers showcase; multi-page demo in `sample-data.json`. Shared classes in `print-baseline.css`. Print CSS refs: MDN [`@page`](https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/At-rules/@page) + [paged media](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_paged_media); engine: [PeachPDF HTML/CSS support](https://peachpdf.net/html-css-support.html).
 
 ## Add a transform (checklist)
 
@@ -88,10 +95,11 @@ Validation failures -> `ArgumentException` / `NotSupportedException` -> HTTP 400
 - Framework 2.0 / 4.5+: no Client — [`../docs/DOTNET_FRAMEWORK_INTEGRATION.md`](../docs/DOTNET_FRAMEWORK_INTEGRATION.md)
 - **Do not reference `OxyKit.Render.Core` from Flow or other consumers.** They use `OxyKit.Render.Client` -> OxyKit.Render API. No tenancy/billing/storage in Core.
 - Template `data` is untrusted: JSON Schema + HTML-escape on interpolate
-- Template helpers (`qr`, `barcode`) return trusted Core markup; do not add a generic raw-HTML escape hatch; register builtins after data import so they cannot be shadowed
+- Template helpers (`qr`, `barcode`, `money`, `number`, `percent`, `date`, `datetime`, `asset`) and `include` return trusted Core / template-folder output; do not add a generic raw-HTML escape hatch; register builtins after data import so they cannot be shadowed; format helpers must not use the host OS locale (default `en-US`)
 - Prefer MIT encode-only deps (QRCoder + Barcoder); do not pull proprietary barcode libs into Core
 - PDF page options use OxyKit.Render `PdfPageSize` / `PdfPageOrientation` (not PeachPDF types); mapped in `PdfPageOptionsResolver`
-- PeachPDF: no remote HTTP fetch; `AllowLocalFileAccess = false`; images via `data:` only; `qr` / `barcode` helpers use inline SVG; no `<link>` styles in templates - inline via `PrintBaselineInjector` / `<style>`
+- PeachPDF: no remote HTTP fetch; `AllowLocalFileAccess = false`; images via `data:` only (`asset`, `qr`, `barcode`); no `<link>` styles in templates - inline via `PrintBaselineInjector` / `<style>`
+- Template `asset` / `include` paths must stay under the template directory (no `..`); allowlisted extensions only
 - Output-affecting packages (QRCoder, Barcoder, …) must appear in `EngineIdentity` components
 - Path-safe template ids only under `Rendering:TemplatesRoot`
 - Table limits live in `TableWorkbookConstraints` (single source of truth)
