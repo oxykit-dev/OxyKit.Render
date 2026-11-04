@@ -93,7 +93,7 @@ Validation failures -> `ArgumentException` / `NotSupportedException` -> HTTP 400
 - Keep Core/Api types `internal sealed` where practical; Local API tests use `InternalsVisibleTo`
 - Public surface for integrators lives in `OxyKit.Render.Contracts` + `OxyKit.Render.Client`
 - Framework 2.0 / 4.5+: no Client — [`../docs/DOTNET_FRAMEWORK_INTEGRATION.md`](../docs/DOTNET_FRAMEWORK_INTEGRATION.md)
-- **Do not reference `OxyKit.Render.Core` from Flow or other consumers.** They use `OxyKit.Render.Client` -> OxyKit.Render API. No tenancy/billing/storage in Core.
+- **Do not reference `OxyKit.Render.Core` from Flow or other consumers.** They use `OxyKit.Render.Client` -> OxyKit.Render API. Core stays a transform engine — no orchestration, mail, or durable storage.
 - Template `data` is untrusted: JSON Schema + HTML-escape on interpolate
 - Template helpers (`qr`, `barcode`, `money`, `number`, `percent`, `date`, `datetime`, `asset`) and `include` return trusted Core / template-folder output; do not add a generic raw-HTML escape hatch; register builtins after data import so they cannot be shadowed; format helpers must not use the host OS locale (default `en-US`)
 - Prefer MIT encode-only deps (QRCoder + Barcoder); do not pull proprietary barcode libs into Core
@@ -134,5 +134,5 @@ Shared lib (NuGet): `OxyKit.Observability` only — see [Observability AGENTS](h
 
 - Prefer this file over dumping README / OpenAPI / Hoppscotch JSON.
 - Prefer editing the smallest owner: Contracts ≠ Client ≠ Core ≠ Api endpoints.
-- Tenancy/billing/storage do not belong in Core/Api.
+- Orchestration, mail delivery, and durable storage do not belong in Core/Api.
 - Suite map: `../AGENTS.md`.
