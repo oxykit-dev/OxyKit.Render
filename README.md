@@ -74,6 +74,8 @@ Local suite checkout (optional):
 | `POST /render/table/xlsx` | structured `sheets` | XLSX |
 | `POST /render/table/csv` | exactly one sheet | CSV |
 
+Template helpers (`qr`, `barcode`, `money`, …, `asset`, `include`) and the invoice starter (`templates/invoice/`, multi-page `sample-data.json`): [oxykit.dev/render/transforms](https://oxykit.dev/render/transforms).
+
 Errors: `{ "error": "..." }` (400 / 401 / 403 / 500). Layout and constraints: [AGENTS.md](./AGENTS.md).
 
 ## Docs

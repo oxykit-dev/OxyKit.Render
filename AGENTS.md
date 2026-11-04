@@ -128,7 +128,7 @@ Shared lib (NuGet): `OxyKit.Observability` only — see [Observability AGENTS](h
 
 ## Config knobs
 
-`Security:RequireLocalRequests`, `ApiKeyHeader`, `ApiKey` (startup fails if missing / `change-me-in-production`); `Rendering:MaxHtmlContentChars`, `MaxCsvContentChars`, `MaxRequestBodyBytes`, `MaxConcurrentRenders`, `TemplatesRoot`, `MaxTemplateChars`, `MaxContractChars`; `Logging:JsonConsole`. Templates on disk: `templates/{id}/template.html` + `contract.json`. Table/CSV limits: `TableWorkbookConstraints`.
+`Security:RequireLocalRequests`, `ApiKeyHeader`, `ApiKey` (startup fails if missing / `change-me-in-production`); `Rendering:MaxHtmlContentChars`, `MaxCsvContentChars`, `MaxRequestBodyBytes`, `MaxConcurrentRenders`, `TemplatesRoot`, `MaxTemplateChars`, `MaxContractChars`, `MaxTemplateAssetBytes`, `MaxTemplatePartialChars`; `Logging:JsonConsole`. Templates on disk: `templates/{id}/template.html` + `contract.json` (required); optional `assets/` (`asset` helper), `partials/` (`include`); `sample-data.json` is demo-only (not loaded by the engine). Table/CSV limits: `TableWorkbookConstraints`.
 
 ## Docs policy for agents
 
