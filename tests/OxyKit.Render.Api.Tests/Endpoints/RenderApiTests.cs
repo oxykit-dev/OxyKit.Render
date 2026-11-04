@@ -548,12 +548,18 @@ public sealed class RenderApiTests(WebApplicationFactory<Program> factory)
         Assert.Contains("body.pf-document", html);
         Assert.Contains("@page", html);
         Assert.Contains("pf-num", html);
+        Assert.Contains("class=\"pf-header\"", html);
+        Assert.Contains("class=\"pf-footer\"", html);
+        Assert.Contains("class=\"pf-qr\"", html);
+        Assert.Contains("class=\"pf-barcode\"", html);
+        Assert.Contains("<svg ", html);
+        Assert.DoesNotContain("data:image/png", html);
 
         var baselineAt = html.IndexOf(
             OxyKit.Render.Core.Outputs.PrintBaselineCss.Content,
             StringComparison.Ordinal
         );
-        var overrideAt = html.IndexOf("font-size: 18pt", StringComparison.Ordinal);
+        var overrideAt = html.IndexOf("pf-doc-title", StringComparison.Ordinal);
         Assert.True(baselineAt >= 0);
         Assert.True(overrideAt > baselineAt);
     }

@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://phaseflow.local/templates/invoice/contract.json",
+  "$id": "https://oxykit.dev/templates/invoice/contract.json",
   "title": "Invoice",
   "type": "object",
   "additionalProperties": false,
@@ -13,6 +13,29 @@
     "customerName": {
       "type": "string",
       "minLength": 1
+    },
+    "customerAddress": {
+      "type": "string"
+    },
+    "issuerName": {
+      "type": "string"
+    },
+    "issuerAddress": {
+      "type": "string"
+    },
+    "issueDate": {
+      "type": "string"
+    },
+    "dueDate": {
+      "type": "string"
+    },
+    "currency": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 8
+    },
+    "notes": {
+      "type": "string"
     },
     "total": {
       "type": "number"

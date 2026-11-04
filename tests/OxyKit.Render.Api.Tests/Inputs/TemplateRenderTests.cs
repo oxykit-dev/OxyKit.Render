@@ -67,4 +67,65 @@ public sealed class ScribanTemplateRendererTests
 
         Assert.Equal("<p>Beta-12</p>", html);
     }
+
+    [Fact]
+    public void Render_QrHelper_EmitsInlineSvg()
+    {
+        var html = ScribanTemplateRenderer.Render(
+            "<div>{{ qr code }}</div>",
+            JsonDocument.Parse("""{"code":"INV-100"}""").RootElement
+        );
+
+        Assert.Contains("<svg ", html);
+        Assert.Contains("xmlns=\"http://www.w3.org/2000/svg\"", html);
+        Assert.DoesNotContain("data:image/png", html);
+        Assert.DoesNotContain("{{ qr", html);
+    }
+
+    [Fact]
+    public void Render_QrHelper_NamedPixelsAndEcc()
+    {
+        var html = ScribanTemplateRenderer.Render(
+            "{{ qr code pixels: 6 ecc: \"H\" }}",
+            JsonDocument.Parse("""{"code":"ABC"}""").RootElement
+        );
+
+        Assert.Contains("<svg ", html);
+    }
+
+    [Fact]
+    public void Render_QrHelper_StillHtmlEncodesPlainInterpolations()
+    {
+        var html = ScribanTemplateRenderer.Render(
+            "<p>{{ name }}</p>{{ qr name }}",
+            JsonDocument.Parse("""{"name":"<b>Acme</b>"}""").RootElement
+        );
+
+        Assert.Contains("<p>&lt;b&gt;Acme&lt;/b&gt;</p>", html);
+        Assert.Contains("<svg ", html);
+        Assert.DoesNotContain("<p><b>Acme</b></p>", html);
+    }
+
+    [Fact]
+    public void Render_QrBuiltin_WinsOverDataFieldNamedQr()
+    {
+        var html = ScribanTemplateRenderer.Render(
+            "{{ qr code }}",
+            JsonDocument.Parse("""{"qr":"shadow","code":"OK"}""").RootElement
+        );
+
+        Assert.Contains("<svg ", html);
+    }
+
+    [Fact]
+    public void Render_BarcodeHelper_EmitsInlineSvg()
+    {
+        var html = ScribanTemplateRenderer.Render(
+            "{{ barcode \"code128\" sku }}",
+            JsonDocument.Parse("""{"sku":"ABC-123"}""").RootElement
+        );
+
+        Assert.Contains("<svg ", html);
+        Assert.Contains("xmlns=\"http://www.w3.org/2000/svg\"", html);
+    }
 }

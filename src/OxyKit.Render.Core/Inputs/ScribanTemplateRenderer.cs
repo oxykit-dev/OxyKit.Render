@@ -38,6 +38,9 @@ internal static class ScribanTemplateRenderer
             }
         }
 
+        // Builtins last so a data field named `qr` cannot shadow the helper.
+        TemplateQrFunctions.Register(scriptObject);
+
         var context = new TemplateContext();
         context.PushGlobal(scriptObject);
 

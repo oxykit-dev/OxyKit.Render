@@ -18,7 +18,7 @@ Token-efficient map. Prefer this over exploring the tree or loading the full REA
 | Request DTOs / public shapes | `OxyKit.Render.Contracts/` |
 | Typed HTTP SDK | `OxyKit.Render.Client/RenderClient.cs` |
 | Table/CSV limits & typing | `Core/Inputs/TableWorkbookConstraints.cs`, `Core/IsoDateCell.cs`, `Core/Inputs/CsvTableParser.cs` |
-| Templates | `Core/Inputs/TemplateStore.cs`, `TemplateDataValidator.cs`, `ScribanTemplateRenderer.cs` |
+| Templates | `Core/Inputs/TemplateStore.cs`, `TemplateDataValidator.cs`, `ScribanTemplateRenderer.cs`, `TemplateQrFunctions.cs`, `QrSvgEncoder.cs`, `BarcodeSvgEncoder.cs` |
 | PDF | `Core/Outputs/HtmlToPdfRenderer.cs`, `PdfPageOptions.cs`, `Contracts/PdfPageEnums.cs` |
 | Print CSS | `Core/assets/print-baseline.css`, `Outputs/PrintBaselineInjector.cs` |
 | Auth | `Api/Security/InternalAccessMiddleware.cs` |
@@ -56,6 +56,16 @@ Also `GET /formats`, `/templates`, `/health` (anon), `/v1/health` (anon).
 Successful renders stamp `X-OxyKit-Render-Version` + `X-OxyKit-Render-Fingerprint` (see `EngineIdentity`, `RenderEngineHeaders`); `/health` returns the same as JSON.  
 OpenAPI (Development only, anon): `/openapi/v1.json` + Scalar `/scalar` (suite convention).
 
+### Template helpers (Scriban)
+
+| Helper | Emits | Notes |
+|--------|-------|--------|
+| `qr payload` | Inline SVG | QRCoder matrix (MIT) + custom SVG. Optional `pixels:` (2–16, default 4), `ecc:` (`L`\|`M`\|`Q`\|`H`, default `M`); max 2048 UTF-8 bytes |
+| `barcode symbology payload` | Inline SVG | Barcoder (MIT). Symbologies: `code128`, `code39`, `ean13`. 1D uses `width="100%"` + viewBox (fills content). Optional `height:` (bar aspect px), `pixels:` (multi-row only). Custom SVG — no ImageSharp/SvgLib |
+
+Trusted template markup only — `data` strings stay HTML-escaped on import; helper output is Core-generated. Pins: `qrcoder@`, `barcoder@` in `EngineIdentity`.  
+**Golden sample:** `templates/invoice/` — canonical print doc (`.pf-header` / parties / `.pf-marks` / lines / `.pf-footer`); barcode box ~70mm; shared chrome classes live in `print-baseline.css`.
+
 ## Add a transform (checklist)
 
 1. Normalize under `Core/Inputs/` if needed
@@ -78,8 +88,11 @@ Validation failures -> `ArgumentException` / `NotSupportedException` -> HTTP 400
 - Framework 2.0 / 4.5+: no Client — [`../docs/DOTNET_FRAMEWORK_INTEGRATION.md`](../docs/DOTNET_FRAMEWORK_INTEGRATION.md)
 - **Do not reference `OxyKit.Render.Core` from Flow or other consumers.** They use `OxyKit.Render.Client` -> OxyKit.Render API. No tenancy/billing/storage in Core.
 - Template `data` is untrusted: JSON Schema + HTML-escape on interpolate
+- Template helpers (`qr`, `barcode`) return trusted Core markup; do not add a generic raw-HTML escape hatch; register builtins after data import so they cannot be shadowed
+- Prefer MIT encode-only deps (QRCoder + Barcoder); do not pull proprietary barcode libs into Core
 - PDF page options use OxyKit.Render `PdfPageSize` / `PdfPageOrientation` (not PeachPDF types); mapped in `PdfPageOptionsResolver`
-- PeachPDF: no remote HTTP fetch; `AllowLocalFileAccess = false`; no `<link>` styles in templates - inline via `PrintBaselineInjector` / `<style>`
+- PeachPDF: no remote HTTP fetch; `AllowLocalFileAccess = false`; images via `data:` only; `qr` / `barcode` helpers use inline SVG; no `<link>` styles in templates - inline via `PrintBaselineInjector` / `<style>`
+- Output-affecting packages (QRCoder, Barcoder, …) must appear in `EngineIdentity` components
 - Path-safe template ids only under `Rendering:TemplatesRoot`
 - Table limits live in `TableWorkbookConstraints` (single source of truth)
 - Auth/render errors use shared `ErrorResponse` (`{ "error": "..." }`); anonymous paths via `AnonymousPaths`

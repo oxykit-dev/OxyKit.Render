@@ -1,9 +1,11 @@
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
+using Barcoder.Code128;
 using ClosedXML.Excel;
 using OxyKit.Render.Core.Outputs;
 using PeachPDF;
+using QRCoder;
 using Scriban;
 
 namespace OxyKit.Render.Core;
@@ -39,6 +41,8 @@ public sealed class EngineIdentity
             $"closedxml@{GetInformationalVersion(typeof(XLWorkbook).Assembly)}",
             $"peachpdf@{GetInformationalVersion(typeof(PdfGenerator).Assembly)}",
             $"scriban@{GetInformationalVersion(typeof(Template).Assembly)}",
+            $"qrcoder@{GetInformationalVersion(typeof(QRCodeGenerator).Assembly)}",
+            $"barcoder@{GetInformationalVersion(typeof(Code128Encoder).Assembly)}",
             $"print-baseline@{Sha256Hex(Encoding.UTF8.GetBytes(PrintBaselineCss.Content))}",
         };
 

@@ -3,33 +3,208 @@
 <head>
   <meta charset="utf-8" />
   <title>Invoice {{ invoiceNumber }}</title>
-  <!-- Print baseline is inlined by PhaseFlow; keep only template-specific overrides. -->
+  <!-- Print baseline is inlined by OxyKit.Render; keep only template-specific overrides.
+       Canonical golden sample: document chrome + QR/Code128 marks + line items. -->
   <style>
-    body.pf-document h1 {
-      margin-bottom: 8px;
-      font-size: 18pt;
+    body.pf-document .pf-brand-name {
+      margin: 0;
+      font-size: 16pt;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      line-height: 1.2;
     }
-    body.pf-document .pf-meta {
-      margin-bottom: 24px;
+    body.pf-document .pf-doc-title {
+      margin: 0 0 8px;
+      font-size: 18pt;
+      font-weight: 700;
+      line-height: 1.15;
+      text-align: right;
+    }
+    body.pf-document .pf-doc-fields {
+      margin: 0;
+      text-align: right;
+      font-size: 10pt;
+      line-height: 1.5;
+    }
+    body.pf-document .pf-doc-fields dt,
+    body.pf-document .pf-doc-fields dd {
+      display: inline;
+      margin: 0;
+    }
+    body.pf-document .pf-doc-fields dt {
+      color: #555;
+      font-weight: 600;
+    }
+    body.pf-document .pf-doc-fields dt::after {
+      content: " ";
+    }
+    body.pf-document .pf-doc-fields dd {
+      font-variant-numeric: tabular-nums;
+    }
+    body.pf-document .pf-doc-fields dd::after {
+      content: "\A";
+      white-space: pre;
+    }
+    body.pf-document .pf-party-label {
+      margin: 0 0 4px;
+      color: #555;
+      font-size: 8.5pt;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    body.pf-document .pf-party-name {
+      margin: 0 0 2px;
+      font-size: 11pt;
+      font-weight: 600;
+    }
+    /* Marks on their own row (not half-column) so 70mm barcode stays on-page. */
+    body.pf-document .pf-marks {
+      width: auto;
+      max-width: 100%;
+    }
+    body.pf-document .pf-marks td {
+      width: auto !important;
+    }
+    body.pf-document .pf-marks td:first-child {
+      padding-right: 16px !important;
+    }
+    body.pf-document .pf-qr svg {
+      display: block;
+      width: 28mm;
+      height: 28mm;
+    }
+    body.pf-document .pf-barcode {
+      width: 70mm;
+      max-width: 70mm;
+    }
+    body.pf-document .pf-barcode svg {
+      display: block;
+      width: 100%;
+      max-width: 100%;
+      height: auto;
+    }
+    body.pf-document .pf-mark-caption {
+      margin: 4px 0 0;
+      font-size: 8pt;
+      color: #555;
+      letter-spacing: 0.02em;
+    }
+    body.pf-document .pf-lines th:last-child,
+    body.pf-document .pf-lines td:last-child {
+      width: 28%;
+    }
+    body.pf-document .pf-totals {
+      margin-top: 8px;
+      text-align: right;
+    }
+    body.pf-document .pf-totals .pf-total {
+      margin: 0;
+      font-size: 13pt;
+    }
+    body.pf-document .pf-notes {
+      margin-top: 16px;
+      color: #444;
+      font-size: 9.5pt;
+    }
+    body.pf-document .pf-preline {
+      white-space: pre-line;
     }
   </style>
 </head>
 <body class="pf-document">
-  <h1>Invoice {{ invoiceNumber }}</h1>
-  <p class="pf-meta">Customer: {{ customerName }}</p>
-  <table>
-    <thead>
-      <tr><th>Description</th><th class="pf-num">Amount</th></tr>
-    </thead>
-    <tbody>
-    {{ for line in lines }}
+
+  <header class="pf-header">
+    <table class="pf-layout">
       <tr>
-        <td>{{ line.description }}</td>
-        <td class="pf-num">{{ line.amount }}</td>
+        <td>
+          <p class="pf-kicker">From</p>
+          <p class="pf-brand-name">{{ if issuerName; issuerName; else; "OxyKit Demo"; end }}</p>
+          {{ if issuerAddress }}
+          <p class="pf-muted pf-preline">{{ issuerAddress }}</p>
+          {{ end }}
+        </td>
+        <td>
+          <h1 class="pf-doc-title">Invoice</h1>
+          <dl class="pf-doc-fields">
+            <dt>Number</dt><dd>{{ invoiceNumber }}</dd>
+            {{ if issueDate }}
+            <dt>Issued</dt><dd>{{ issueDate }}</dd>
+            {{ end }}
+            {{ if dueDate }}
+            <dt>Due</dt><dd>{{ dueDate }}</dd>
+            {{ end }}
+          </dl>
+        </td>
       </tr>
+    </table>
+  </header>
+
+  <section class="pf-parties">
+    <p class="pf-party-label">Bill to</p>
+    <p class="pf-party-name">{{ customerName }}</p>
+    {{ if customerAddress }}
+    <p class="pf-muted pf-preline">{{ customerAddress }}</p>
     {{ end }}
-    </tbody>
-  </table>
-  <p class="pf-total">Total: {{ total }}</p>
+  </section>
+
+  <section>
+    <table class="pf-layout pf-marks">
+      <tr>
+        <td>
+          <div class="pf-qr">
+            {{ qr invoiceNumber pixels: 4 }}
+            <p class="pf-mark-caption">Scan invoice</p>
+          </div>
+        </td>
+        <td>
+          <div class="pf-barcode">
+            {{ barcode "code128" invoiceNumber height: 36 }}
+            <p class="pf-mark-caption">{{ invoiceNumber }}</p>
+          </div>
+        </td>
+      </tr>
+    </table>
+  </section>
+
+  <section class="pf-lines">
+    <h2>Line items</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Description</th>
+          <th class="pf-num">Amount{{ if currency }} ({{ currency }}){{ end }}</th>
+        </tr>
+      </thead>
+      <tbody>
+      {{ for line in lines }}
+        <tr>
+          <td>{{ line.description }}</td>
+          <td class="pf-num">{{ line.amount }}</td>
+        </tr>
+      {{ end }}
+      </tbody>
+    </table>
+    <div class="pf-totals">
+      <p class="pf-total">Total{{ if currency }} ({{ currency }}){{ end }}: {{ total }}</p>
+    </div>
+    {{ if notes }}
+    <p class="pf-notes">{{ notes }}</p>
+    {{ end }}
+  </section>
+
+  <footer class="pf-footer">
+    <table class="pf-layout">
+      <tr>
+        <td>
+          {{ invoiceNumber }} · {{ customerName }}
+        </td>
+        <td style="text-align: right;">
+          Generated by OxyKit.Render · A4
+        </td>
+      </tr>
+    </table>
+  </footer>
+
 </body>
 </html>

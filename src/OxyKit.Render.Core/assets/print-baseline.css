@@ -1,12 +1,13 @@
-/* PhaseFlow print baseline — inlined into table HTML/PDF and template HTML/PDF.
+/* OxyKit.Render print baseline — inlined into table HTML/PDF and template HTML/PDF.
    Scope: put class="pf-document" on <body>. Tables, sections, and headings
-   are styled by element. Opt-in modifiers: .pf-num, .pf-bool, .pf-meta, .pf-total.
+   are styled by element. Opt-in modifiers: .pf-num, .pf-bool, .pf-meta, .pf-total,
+   .pf-header, .pf-footer, .pf-layout, .pf-muted, .pf-kicker.
    Do not <link> this file — PeachPDF does not load linked or remote CSS.
    Template-specific overrides belong in a later <style> block in template.html. */
 
 @page {
   size: A4;
-  margin: 16mm;
+  margin: 18mm 16mm 20mm;
 }
 
 *,
@@ -31,7 +32,7 @@ body.pf-document {
 }
 
 body.pf-document section {
-  margin: 0 0 28px;
+  margin: 0 0 22px;
   page-break-inside: avoid;
   break-inside: avoid;
 }
@@ -49,6 +50,21 @@ body.pf-document h1 {
   line-height: 1.25;
   page-break-after: avoid;
   break-after: avoid;
+}
+
+body.pf-document h2 {
+  margin: 0 0 8px;
+  padding: 0;
+  color: #222;
+  font-size: 11pt;
+  font-weight: 600;
+  line-height: 1.3;
+  page-break-after: avoid;
+  break-after: avoid;
+}
+
+body.pf-document p {
+  margin: 0 0 8px;
 }
 
 body.pf-document table {
@@ -80,6 +96,54 @@ body.pf-document tbody tr:nth-child(even) td {
   background: #fafafa;
 }
 
+/* Borderless 2-column chrome (header / parties) — reliable in PeachPDF. */
+body.pf-document table.pf-layout {
+  width: 100%;
+  border: none;
+  margin: 0;
+  table-layout: fixed;
+}
+
+body.pf-document table.pf-layout > tbody > tr > td {
+  border: none;
+  padding: 0;
+  background: transparent;
+  vertical-align: top;
+}
+
+body.pf-document .pf-header {
+  margin: 0 0 20px;
+  padding: 0 0 12px;
+  border-bottom: 1.5px solid #222;
+  page-break-after: avoid;
+  break-after: avoid;
+}
+
+body.pf-document .pf-footer {
+  margin: 28px 0 0;
+  padding: 12px 0 0;
+  border-top: 1px solid #c8c8c8;
+  color: #555;
+  font-size: 8.5pt;
+  line-height: 1.4;
+  page-break-inside: avoid;
+  break-inside: avoid;
+}
+
+body.pf-document .pf-kicker {
+  margin: 0 0 4px;
+  color: #555;
+  font-size: 8.5pt;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+body.pf-document .pf-muted {
+  color: #555;
+  font-size: 9.5pt;
+}
+
 body.pf-document .pf-num {
   text-align: right;
   font-variant-numeric: tabular-nums;
@@ -98,7 +162,7 @@ body.pf-document .pf-meta {
 }
 
 body.pf-document .pf-total {
-  margin: 16px 0 0;
+  margin: 12px 0 0;
   font-weight: 600;
   font-size: 12pt;
 }
@@ -115,6 +179,10 @@ body.pf-document .pf-total {
 
   body.pf-document thead {
     display: table-header-group;
+  }
+
+  body.pf-document tfoot {
+    display: table-footer-group;
   }
 
   body.pf-document tr {

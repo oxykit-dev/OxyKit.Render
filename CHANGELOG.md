@@ -7,6 +7,7 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Added
 
 - Observability via NuGet `OxyKit.Observability` (JSON console + `X-Correlation-Id`; no OTel package)
+- Template Scriban helpers: `qr` (QRCoder MIT matrix → inline SVG) and `barcode` (Barcoder MIT → inline SVG for `code128` / `code39` / `ean13`); invoice golden sample (header/footer chrome + marks + lines); print-baseline adds `.pf-header` / `.pf-footer` / `.pf-layout`; `qrcoder@` + `barcoder@` pins in `EngineIdentity`
 
 ## [0.1.0] - 2026-10-22
 
