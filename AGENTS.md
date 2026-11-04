@@ -28,7 +28,7 @@ Token-efficient map. Prefer this over exploring the tree or loading the full REA
 | Hoppscotch | `hoppscotch/` (do not paste JSON into chat) |
 | Cursor rules | `.cursor/rules/` |
 
-Ignore `bin/`, `obj/`, and copied `appsettings` under test output.
+Ignore `bin/`, `obj/`, `output/`, `TestResults/`, and copied `appsettings` under test output.
 
 **Suite layout:** sibling of `OxyKit.Flow/` (and other suite cores) under `oxykit.suite/` (see `../AGENTS.md`).
 
