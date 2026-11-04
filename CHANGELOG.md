@@ -4,10 +4,16 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+## [0.1.5] - 2026-11-04
+
 ### Added
 
 - Observability via NuGet `OxyKit.Observability` (JSON console + `X-Correlation-Id`; no OTel package)
 - Template Scriban helpers: `qr` / `barcode` (inline SVG); `money` / `number` / `percent` / `date` / `datetime`; `asset` (template-folder → `data:` img); `include` (path-safe `.html` partials); invoice starter (logo, footer partial, `@page` chrome, multi-page `sample-data.json`); print-baseline `.pf-header` / `.pf-footer` / `.pf-layout`; `qrcoder@` + `barcoder@` pins in `EngineIdentity`
+
+### Changed
+
+- Release workflow: `v*` always ships host zips; nuget.org only when Client/Contracts `<Version>` matches the tag (Api + Core carry the host version)
 
 ## [0.1.0] - 2026-10-22
 

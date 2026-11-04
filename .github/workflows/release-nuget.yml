@@ -6,12 +6,13 @@ on:
       - "v*"
 
 jobs:
-  publish:
+  release:
     runs-on: ubuntu-latest
-    environment: nuget
     permissions:
-      id-token: write
       contents: write
+    outputs:
+      version: ${{ steps.version.outputs.VERSION }}
+      publish_nuget: ${{ steps.detect.outputs.publish }}
 
     steps:
       - uses: actions/checkout@v4
@@ -25,20 +26,35 @@ jobs:
         id: version
         run: echo "VERSION=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
 
-      - name: Validate version matches projects
+      - name: Validate host version matches tag
         run: |
           set -euo pipefail
           VERSION="${{ steps.version.outputs.VERSION }}"
           for proj in \
-            src/OxyKit.Render.Contracts/OxyKit.Render.Contracts.csproj \
-            src/OxyKit.Render.Client/OxyKit.Render.Client.csproj
+            src/OxyKit.Render.Api/OxyKit.Render.Api.csproj \
+            src/OxyKit.Render.Core/OxyKit.Render.Core.csproj
           do
             PROJECT_VERSION=$(sed -n 's:.*<Version>\(.*\)</Version>.*:\1:p' "$proj" | head -1)
-            if [ "$PROJECT_VERSION" != "$VERSION" ]; then
-              echo "::error::Tag version ($VERSION) does not match $proj ($PROJECT_VERSION)"
+            if [ -z "$PROJECT_VERSION" ] || [ "$PROJECT_VERSION" != "$VERSION" ]; then
+              echo "::error::Tag version ($VERSION) does not match $proj (${PROJECT_VERSION:-missing})"
               exit 1
             fi
           done
+
+      - name: Detect NuGet publish
+        id: detect
+        run: |
+          set -euo pipefail
+          VERSION="${{ steps.version.outputs.VERSION }}"
+          CLIENT=$(sed -n 's:.*<Version>\(.*\)</Version>.*:\1:p' src/OxyKit.Render.Client/OxyKit.Render.Client.csproj | head -1)
+          CONTRACTS=$(sed -n 's:.*<Version>\(.*\)</Version>.*:\1:p' src/OxyKit.Render.Contracts/OxyKit.Render.Contracts.csproj | head -1)
+          if [ "$CLIENT" = "$VERSION" ] && [ "$CONTRACTS" = "$VERSION" ]; then
+            echo "publish=true" >> "$GITHUB_OUTPUT"
+            echo "Client/Contracts match $VERSION — will publish to nuget.org"
+          else
+            echo "publish=false" >> "$GITHUB_OUTPUT"
+            echo "Host-only release: tag=$VERSION Client=$CLIENT Contracts=$CONTRACTS (skip nuget.org)"
+          fi
 
       - name: Restore
         run: dotnet restore OxyKit.Render.slnx
@@ -52,34 +68,21 @@ jobs:
           dotnet test tests/OxyKit.Render.Client.Tests/OxyKit.Render.Client.Tests.csproj -c Release --no-restore --verbosity normal
 
       - name: Pack Contracts + Client
+        if: steps.detect.outputs.publish == 'true'
         run: |
           mkdir -p artifacts
           dotnet pack src/OxyKit.Render.Contracts/OxyKit.Render.Contracts.csproj -c Release --no-build -o ./artifacts
           dotnet pack src/OxyKit.Render.Client/OxyKit.Render.Client.csproj -c Release --no-build -o ./artifacts
 
-      # 1) Publish Contracts + Client to nuget.org
-      - name: NuGet login (OIDC)
-        id: login
-        uses: NuGet/login@v1
-        with:
-          user: ${{ secrets.NUGET_USER }}
-
-      - name: Push Contracts + Client to nuget.org
-        run: |
-          dotnet nuget push ./artifacts/*.nupkg \
-            --api-key "${{ steps.login.outputs.NUGET_API_KEY }}" \
-            --source https://api.nuget.org/v3/index.json \
-            --skip-duplicate
-
-      # 2) Contracts + Client zip (for GitHub Release download)
       - name: Zip Contracts + Client packages
+        if: steps.detect.outputs.publish == 'true'
         run: |
           VERSION="${{ steps.version.outputs.VERSION }}"
           NUGET_ZIP="OxyKit.Render.Client-${VERSION}-nuget.zip"
           (cd artifacts && zip -r "../${NUGET_ZIP}" .)
           echo "NUGET_ZIP=${NUGET_ZIP}" >> "$GITHUB_ENV"
 
-      # 3) Runnable app zips — framework-dependent per OS (smaller than self-contained; needs .NET 10 runtime)
+      # Runnable app zips — framework-dependent per OS (needs .NET 10 runtime)
       - name: Publish and zip runnable apps
         run: |
           set -euo pipefail
@@ -123,8 +126,51 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           generate_release_notes: true
+          fail_on_unmatched_files: false
           files: |
             ${{ env.NUGET_ZIP }}
             dist/*.zip
             artifacts/*.nupkg
             artifacts/*.snupkg
+
+  nuget:
+    needs: release
+    if: needs.release.outputs.publish_nuget == 'true'
+    runs-on: ubuntu-latest
+    environment: nuget
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Restore
+        run: dotnet restore OxyKit.Render.slnx
+
+      - name: Build
+        run: dotnet build OxyKit.Render.slnx --no-restore -c Release
+
+      - name: Pack Contracts + Client
+        run: |
+          mkdir -p artifacts
+          dotnet pack src/OxyKit.Render.Contracts/OxyKit.Render.Contracts.csproj -c Release --no-build -o ./artifacts
+          dotnet pack src/OxyKit.Render.Client/OxyKit.Render.Client.csproj -c Release --no-build -o ./artifacts
+
+      - name: NuGet login (OIDC)
+        id: login
+        uses: NuGet/login@v1
+        with:
+          user: ${{ secrets.NUGET_USER }}
+
+      - name: Push Contracts + Client to nuget.org
+        run: |
+          dotnet nuget push ./artifacts/*.nupkg \
+            --api-key "${{ steps.login.outputs.NUGET_API_KEY }}" \
+            --source https://api.nuget.org/v3/index.json \
+            --skip-duplicate

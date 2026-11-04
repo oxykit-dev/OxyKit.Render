@@ -6,7 +6,7 @@
     <RootNamespace>OxyKit.Render.Core</RootNamespace>
     <Description>OxyKit.Render document rendering engine (PDF, XLSX, CSV, HTML).</Description>
     <PackageId>OxyKit.Render.Core</PackageId>
-    <Version>0.1.0</Version>
+    <Version>0.1.5</Version>
     <Authors>OxyKit.Render</Authors>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
