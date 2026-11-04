@@ -15,7 +15,7 @@
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.13" />
     <PackageReference Include="Microsoft.OpenApi" Version="2.12.2" />
     <PackageReference Include="OxyKit.Observability" Version="0.1.1" />
-    <PackageReference Include="Scalar.AspNetCore" Version="2.18.0" />
+    <PackageReference Include="Scalar.AspNetCore" Version="2.18.7" />
   </ItemGroup>
 
   <ItemGroup>
