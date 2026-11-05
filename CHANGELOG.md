@@ -4,6 +4,18 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Added
+
+- Template pack management: `GET/PUT/DELETE /templates/{id}`, `GET /templates/{id}/pack` (zip upload/download; replace-in-place under `Rendering:TemplatesRoot`)
+- Optional Mail JWT under `Security:Jwt` (same issuer, audience, and key as Mail). API key remains full access; a non-empty key header that does not match is 401 (no Bearer fallback). Bearer roles: Admin pack write, Admin|User pack read, Admin|User|Sender render
+- Per-template assets: `PUT|DELETE /templates/{id}/assets/{*path}` (label → `assets/…` for `{{ asset }}`; png/jpg/gif/webp/svg)
+- Compose: durable `render-templates` volume + seed entrypoint (`fonts-liberation` already required for PDF)
+
+### Changed
+
+- `Rendering:MaxRequestBodyBytes` default raised to 5 MiB; new `MaxTemplatePackBytes` (2 MiB) for zip uploads
+- Api csproj copies template HTML/SVG/`partials`/`assets` on publish (`None` + `Content` Update)
+
 ## [0.1.5] - 2026-11-04
 
 ### Added

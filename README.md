@@ -21,7 +21,8 @@ dotnet run --project src/OxyKit.Render.Api
 | URL / header | Purpose |
 |--------------|---------|
 | `http://localhost:5066` | API |
-| `X-OxyKit-Render-Key: dev-local-key` | Dev API key (`appsettings.Development.json`) |
+| `X-OxyKit-Render-Key: dev-local-key` | Dev API key (`appsettings.Development.json`). A non-empty key header is the only credential checked |
+| `Authorization: Bearer` | Mail JWT when `Security:Jwt` matches Mail (Admin pack write, Admin\|User pack read, Admin\|User\|Sender render) |
 | `GET /health` | Anonymous |
 | `X-Correlation-Id` | Optional; echoed on every response (generated if omitted) |
 | `/scalar`, `/openapi/v1.json` | OpenAPI UI + JSON (Development only) |
@@ -74,7 +75,7 @@ Local suite checkout (optional):
 | `POST /render/table/xlsx` | structured `sheets` | XLSX |
 | `POST /render/table/csv` | exactly one sheet | CSV |
 
-Template helpers (`qr`, `barcode`, `money`, …, `asset`, `include`) and the invoice starter (`templates/invoice/`, multi-page `sample-data.json`): [oxykit.dev/render/transforms](https://oxykit.dev/render/transforms).
+Template helpers (`qr`, `barcode`, `money`, …, `asset`, `include`) and the invoice starter (`templates/invoice/`, multi-page `sample-data.json`): [oxykit.dev/render/transforms](https://oxykit.dev/render/transforms). Pack upload is a zip with `template.html` + `contract.json` (`GET|PUT|DELETE /templates/{id}`, `GET .../pack`). Asset labels land under `assets/` for `{{ asset }}`. Compose keeps packs on the `render-templates` volume.
 
 Errors: `{ "error": "..." }` (400 / 401 / 403 / 500). Layout and constraints: [AGENTS.md](./AGENTS.md).
 
@@ -84,6 +85,7 @@ Errors: `{ "error": "..." }` (400 / 401 / 403 / 500). Layout and constraints: [A
 |-----|------|
 | [AGENTS.md](./AGENTS.md) | Layout, constraints, add-transform checklist |
 | [oxykit.dev/render](https://oxykit.dev/render/) | Product docs |
+| [oxykit.dev/guide/iis](https://oxykit.dev/guide/iis) | Windows / IIS |
 | [hoppscotch/](./hoppscotch/) | Manual HTTP smoke |
 | [CHANGELOG.md](./CHANGELOG.md) | Keep a Changelog |
 | `/scalar` · `/openapi/v1.json` | Live API shapes (Development) |

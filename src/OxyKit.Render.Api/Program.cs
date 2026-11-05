@@ -34,10 +34,14 @@ builder
             && options.MaxCsvContentChars > 0
             && options.MaxTemplateChars > 0
             && options.MaxContractChars > 0
+            && options.MaxTemplateAssetBytes > 0
+            && options.MaxTemplatePartialChars > 0
+            && options.MaxTemplatePackBytes > 0
             && options.MaxRequestBodyBytes > 0
+            && options.MaxRequestBodyBytes >= options.MaxTemplatePackBytes
             && options.MaxConcurrentRenders > 0
             && !string.IsNullOrWhiteSpace(options.TemplatesRoot),
-        "Rendering limits must be positive and TemplatesRoot must be set."
+        "Rendering limits must be positive, TemplatesRoot must be set, and MaxRequestBodyBytes must cover MaxTemplatePackBytes."
     )
     .ValidateOnStart();
 

@@ -16,10 +16,13 @@
     <PackageReference Include="Microsoft.OpenApi" Version="2.12.2" />
     <PackageReference Include="OxyKit.Observability" Version="0.1.1" />
     <PackageReference Include="Scalar.AspNetCore" Version="2.18.7" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.19.2" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Update="templates\**\*" CopyToOutputDirectory="PreserveNewest" />
+    <!-- HTML/SVG land as None (not Content); JSON is Content. Copy both on publish (Linux Docker + local). -->
+    <None Update="templates/**/*" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <Content Update="templates/**/*" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
 
   <ItemGroup>

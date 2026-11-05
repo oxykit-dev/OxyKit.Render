@@ -7,4 +7,7 @@ internal sealed class SecurityOptions
     public bool RequireLocalRequests { get; init; } = true;
     public string ApiKeyHeader { get; init; } = "X-OxyKit-Render-Key";
     public string ApiKey { get; init; } = string.Empty;
+
+    /// <summary>Optional Mail JWT (human UI). Same values as Mail <c>Jwt:*</c>.</summary>
+    public JwtOptions Jwt { get; init; } = new();
 }

@@ -2,7 +2,7 @@
   "v": 12,
   "name": "OxyKit.Render",
   "variables": [],
-  "description": "Local smoke tests for OxyKit.Render render API (html/csv/table/template → pdf/xlsx/csv/html). Import with OxyKit.Render.environment.json, then Run collection.",
+  "description": "Local smoke tests for OxyKit.Render render API (html/csv/table/template \u2192 pdf/xlsx/csv/html). Import with OxyKit.Render.environment.json, then Run collection.",
   "folders": [
     {
       "v": 12,
@@ -31,12 +31,12 @@
           },
           "requestVariables": [],
           "responses": {},
-          "description": "Liveness check — no API key required."
+          "description": "Liveness check \u2014 no API key required."
         },
         {
           "v": "17",
           "id": "pf-formats-unauthorized",
-          "name": "GET /formats without API key → 401",
+          "name": "GET /formats without API key \u2192 401",
           "method": "GET",
           "endpoint": "<<baseUrl>>/formats",
           "params": [],
@@ -97,7 +97,7 @@
       "v": 12,
       "name": "Templates",
       "variables": [],
-      "description": "On-disk Scriban templates (starter: invoice) → HTML preview or PDF.",
+      "description": "On-disk Scriban templates: list, detail, zip pack, asset PUT/DELETE, HTML preview or PDF.",
       "folders": [],
       "requests": [
         {
@@ -124,8 +124,80 @@
         },
         {
           "v": "17",
+          "id": "pf-templates-get",
+          "name": "GET /templates/{id}",
+          "method": "GET",
+          "endpoint": "<<baseUrl>>/templates/invoice",
+          "params": [],
+          "headers": [],
+          "preRequestScript": "",
+          "testScript": "pw.test(\"status is 200\", () => {\n  pw.expect(pw.response.status).toBe(200);\n});\npw.test(\"invoice detail\", () => {\n  pw.expect(pw.response.body.id).toBe(\"invoice\");\n  pw.expect(pw.response.body.hasContract).toBe(true);\n  const files = JSON.stringify(pw.response.body.files || []);\n  pw.expect(files.includes(\"template.html\")).toBe(true);\n});\n",
+          "auth": {
+            "authType": "inherit",
+            "authActive": true
+          },
+          "body": {
+            "contentType": null,
+            "body": null
+          },
+          "requestVariables": [],
+          "responses": {},
+          "description": "Metadata + relative file list for one pack."
+        },
+        {
+          "v": "17",
+          "id": "pf-templates-pack",
+          "name": "GET /templates/{id}/pack",
+          "method": "GET",
+          "endpoint": "<<baseUrl>>/templates/invoice/pack",
+          "params": [],
+          "headers": [],
+          "preRequestScript": "",
+          "testScript": "pw.test(\"status is 200\", () => {\n  pw.expect(pw.response.status).toBe(200);\n});\npw.test(\"zip content-type\", () => {\n  const ct = (pw.response.headers[\"content-type\"] || \"\").toLowerCase();\n  pw.expect(ct.includes(\"zip\") || ct.includes(\"octet-stream\")).toBe(true);\n});\n",
+          "auth": {
+            "authType": "inherit",
+            "authActive": true
+          },
+          "body": {
+            "contentType": null,
+            "body": null
+          },
+          "requestVariables": [],
+          "responses": {},
+          "description": "Download pack as application/zip."
+        },
+        {
+          "v": "17",
+          "id": "pf-templates-asset-put",
+          "name": "PUT /templates/{id}/assets/{path}",
+          "method": "PUT",
+          "endpoint": "<<baseUrl>>/templates/invoice/assets/logo.svg",
+          "params": [],
+          "headers": [
+            {
+              "key": "Content-Type",
+              "value": "image/svg+xml",
+              "active": true
+            }
+          ],
+          "preRequestScript": "",
+          "testScript": "pw.test(\"status is 200 or 400\", () => {\n  pw.expect([200, 400].includes(pw.response.status)).toBe(true);\n});\n",
+          "auth": {
+            "authType": "inherit",
+            "authActive": true
+          },
+          "body": {
+            "contentType": "text/plain",
+            "body": "<svg xmlns=\\\"http://www.w3.org/2000/svg\\\"/>"
+          },
+          "requestVariables": [],
+          "responses": {},
+          "description": "Replace a pack asset by label (logo.svg \u2192 assets/logo.svg). Prefer binary body in clients; Hoppscotch body is illustrative."
+        },
+        {
+          "v": "17",
           "id": "pf-template-html-ok",
-          "name": "Render template → HTML",
+          "name": "Render template \u2192 HTML",
           "method": "POST",
           "endpoint": "<<baseUrl>>/render/template/html",
           "params": [],
@@ -147,7 +219,7 @@
         {
           "v": "17",
           "id": "pf-template-pdf-ok",
-          "name": "Render template → PDF",
+          "name": "Render template \u2192 PDF",
           "method": "POST",
           "endpoint": "<<baseUrl>>/render/template/pdf",
           "params": [],
@@ -169,7 +241,7 @@
         {
           "v": "17",
           "id": "pf-template-pdf-invalid-data",
-          "name": "Invalid data → 400",
+          "name": "Invalid data \u2192 400",
           "method": "POST",
           "endpoint": "<<baseUrl>>/render/template/pdf",
           "params": [],
@@ -191,7 +263,7 @@
         {
           "v": "17",
           "id": "pf-template-html-extra-props",
-          "name": "Additional properties → 400",
+          "name": "Additional properties \u2192 400",
           "method": "POST",
           "endpoint": "<<baseUrl>>/render/template/html",
           "params": [],
@@ -213,7 +285,7 @@
         {
           "v": "17",
           "id": "pf-template-pdf-unknown",
-          "name": "Unknown template → 400",
+          "name": "Unknown template \u2192 400",
           "method": "POST",
           "endpoint": "<<baseUrl>>/render/template/pdf",
           "params": [],
@@ -250,7 +322,7 @@
     },
     {
       "v": 12,
-      "name": "HTML → PDF",
+      "name": "HTML \u2192 PDF",
       "variables": [],
       "description": null,
       "folders": [],
@@ -258,7 +330,7 @@
         {
           "v": "17",
           "id": "pf-html-pdf-ok",
-          "name": "Render HTML → PDF",
+          "name": "Render HTML \u2192 PDF",
           "method": "POST",
           "endpoint": "<<baseUrl>>/render/html/pdf",
           "params": [],
@@ -280,7 +352,7 @@
         {
           "v": "17",
           "id": "pf-html-pdf-missing-content",
-          "name": "Missing content → 400",
+          "name": "Missing content \u2192 400",
           "method": "POST",
           "endpoint": "<<baseUrl>>/render/html/pdf",
           "params": [],
@@ -317,15 +389,15 @@
     },
     {
       "v": 12,
-      "name": "CSV → PDF / Excel",
+      "name": "CSV \u2192 PDF / Excel",
       "variables": [],
-      "description": "RFC 4180 CSV text in content → PDF or XLSX.",
+      "description": "RFC 4180 CSV text in content \u2192 PDF or XLSX.",
       "folders": [],
       "requests": [
         {
           "v": "17",
           "id": "pf-csv-xlsx-ok",
-          "name": "Render CSV → XLSX",
+          "name": "Render CSV \u2192 XLSX",
           "method": "POST",
           "endpoint": "<<baseUrl>>/render/csv/xlsx",
           "params": [],
@@ -347,7 +419,7 @@
         {
           "v": "17",
           "id": "pf-csv-pdf-ok",
-          "name": "Render CSV → PDF",
+          "name": "Render CSV \u2192 PDF",
           "method": "POST",
           "endpoint": "<<baseUrl>>/render/csv/pdf",
           "params": [],
@@ -369,7 +441,7 @@
         {
           "v": "17",
           "id": "pf-csv-xlsx-missing",
-          "name": "Missing content → 400",
+          "name": "Missing content \u2192 400",
           "method": "POST",
           "endpoint": "<<baseUrl>>/render/csv/xlsx",
           "params": [],
@@ -406,7 +478,7 @@
     },
     {
       "v": 12,
-      "name": "Table → HTML",
+      "name": "Table \u2192 HTML",
       "variables": [],
       "description": "Standalone HTML preview using the shared print baseline stylesheet.",
       "folders": [],
@@ -414,7 +486,7 @@
         {
           "v": "17",
           "id": "pf-table-html-ok",
-          "name": "Render table → HTML",
+          "name": "Render table \u2192 HTML",
           "method": "POST",
           "endpoint": "<<baseUrl>>/render/table/html",
           "params": [],
@@ -451,7 +523,7 @@
     },
     {
       "v": 12,
-      "name": "Table → PDF",
+      "name": "Table \u2192 PDF",
       "variables": [],
       "description": null,
       "folders": [],
@@ -459,7 +531,7 @@
         {
           "v": "17",
           "id": "pf-table-pdf-ok",
-          "name": "Render table → PDF",
+          "name": "Render table \u2192 PDF",
           "method": "POST",
           "endpoint": "<<baseUrl>>/render/table/pdf",
           "params": [],
@@ -496,7 +568,7 @@
     },
     {
       "v": 12,
-      "name": "Table → Excel",
+      "name": "Table \u2192 Excel",
       "variables": [],
       "description": "Excel export including ISO date coercion and validation failures.",
       "folders": [],
@@ -504,7 +576,7 @@
         {
           "v": "17",
           "id": "pf-table-xlsx-ok",
-          "name": "Render table → XLSX",
+          "name": "Render table \u2192 XLSX",
           "method": "POST",
           "endpoint": "<<baseUrl>>/render/table/xlsx",
           "params": [],
@@ -548,7 +620,7 @@
         {
           "v": "17",
           "id": "pf-table-xlsx-object-cell",
-          "name": "Object cell → 400",
+          "name": "Object cell \u2192 400",
           "method": "POST",
           "endpoint": "<<baseUrl>>/render/table/xlsx",
           "params": [],
@@ -570,7 +642,7 @@
         {
           "v": "17",
           "id": "pf-table-xlsx-ragged",
-          "name": "Ragged rows → 400",
+          "name": "Ragged rows \u2192 400",
           "method": "POST",
           "endpoint": "<<baseUrl>>/render/table/xlsx",
           "params": [],
@@ -607,7 +679,7 @@
     },
     {
       "v": 12,
-      "name": "Table → CSV",
+      "name": "Table \u2192 CSV",
       "variables": [],
       "description": null,
       "folders": [],
@@ -615,7 +687,7 @@
         {
           "v": "17",
           "id": "pf-table-csv-ok",
-          "name": "Render table → CSV",
+          "name": "Render table \u2192 CSV",
           "method": "POST",
           "endpoint": "<<baseUrl>>/render/table/csv",
           "params": [],
@@ -659,7 +731,7 @@
         {
           "v": "17",
           "id": "pf-table-csv-multi-sheet",
-          "name": "Multiple sheets → 400",
+          "name": "Multiple sheets \u2192 400",
           "method": "POST",
           "endpoint": "<<baseUrl>>/render/table/csv",
           "params": [],

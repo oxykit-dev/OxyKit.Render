@@ -52,9 +52,10 @@ hoppscotch/
 `csv/pdf` `csv/xlsx` `html/pdf` `table/csv` `table/html` `table/pdf` `table/xlsx` `template/html` `template/pdf`
 
 Route pattern: `POST /render/{input}/{output}` and aliases under `POST /v1/render/{input}/{output}`.
-Also `GET /formats`, `/templates`, `/health` (anon), `/v1/health` (anon).  
+Also `GET /formats`, `/templates`, `GET|PUT|DELETE /templates/{id}`, `GET /templates/{id}/pack` (zip), `PUT|DELETE /templates/{id}/assets/{*path}`, `/health` (anon), `/v1/health` (anon).  
 Successful renders stamp `X-OxyKit-Render-Version` + `X-OxyKit-Render-Fingerprint` (see `EngineIdentity`, `RenderEngineHeaders`); `/health` returns the same as JSON.  
-OpenAPI (Development only, anon): `/openapi/v1.json` + Scalar `/scalar` (suite convention).
+OpenAPI (Development only, anon): `/openapi/v1.json` + Scalar `/scalar` (suite convention).  
+**Template packs:** zip root (or one top-level folder) must include `template.html` + `contract.json`; optional `sample-data.json`, `partials/*.html`, `assets/*` (png/jpg/gif/webp/svg). Per-file asset upload uses a label (`logo.svg` → `assets/logo.svg`) for `{{ asset "assets/logo.svg" }}`. Trusted markup — machine API key **or** Mail JWT (`Admin` for pack write; `Admin|User` pack read; `Admin|User|Sender` render). A non-empty API key header is authoritative (a mismatch is 401, not a Bearer fallback). Client SDK stays key-oriented. Console: sibling `oxykit-console/` (Render module).
 
 ### Template helpers (Scriban)
 
@@ -128,7 +129,7 @@ Shared lib (NuGet): `OxyKit.Observability` only — see [Observability AGENTS](h
 
 ## Config knobs
 
-`Security:RequireLocalRequests`, `ApiKeyHeader`, `ApiKey` (startup fails if missing / `change-me-in-production`); `Rendering:MaxHtmlContentChars`, `MaxCsvContentChars`, `MaxRequestBodyBytes`, `MaxConcurrentRenders`, `TemplatesRoot`, `MaxTemplateChars`, `MaxContractChars`, `MaxTemplateAssetBytes`, `MaxTemplatePartialChars`; `Logging:JsonConsole`. Templates on disk: `templates/{id}/template.html` + `contract.json` (required); optional `assets/` (`asset` helper), `partials/` (`include`); `sample-data.json` is demo-only (not loaded by the engine). Table/CSV limits: `TableWorkbookConstraints`.
+`Security:RequireLocalRequests`, `ApiKeyHeader`, `ApiKey` (startup fails if missing / `change-me-in-production`); optional `Security:Jwt:Key|Issuer|Audience` (same as Mail `Jwt:*` for human Bearer); `Rendering:MaxHtmlContentChars`, `MaxCsvContentChars`, `MaxRequestBodyBytes`, `MaxConcurrentRenders`, `TemplatesRoot`, `MaxTemplateChars`, `MaxContractChars`, `MaxTemplateAssetBytes`, `MaxTemplatePartialChars`, `MaxTemplatePackBytes`; `Logging:JsonConsole`. Templates on disk: `templates/{id}/template.html` + `contract.json` (required); optional `assets/` (`asset` helper), `partials/` (`include`); `sample-data.json` is demo-only (not loaded by the engine). Compose mounts `TemplatesRoot` at `/data/templates` (seed from image when empty). Table/CSV limits: `TableWorkbookConstraints`. Pack write path: `Core/Inputs/TemplatePack.cs` (partial `TemplateStore`).
 
 ## Docs policy for agents
 

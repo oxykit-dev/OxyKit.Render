@@ -10,8 +10,8 @@ internal sealed class RenderingOptions
     /// <summary>Maximum CSV character length for /render/csv/*.</summary>
     public int MaxCsvContentChars { get; init; } = 1_000_000;
 
-    /// <summary>Maximum JSON request body size in bytes.</summary>
-    public long MaxRequestBodyBytes { get; init; } = 2 * 1024 * 1024;
+    /// <summary>Maximum JSON / zip request body size in bytes (covers template pack uploads).</summary>
+    public long MaxRequestBodyBytes { get; init; } = 5 * 1024 * 1024;
 
     /// <summary>Max concurrent render operations (PDF/XLSX).</summary>
     public int MaxConcurrentRenders { get; init; } = 4;
@@ -33,4 +33,7 @@ internal sealed class RenderingOptions
 
     /// <summary>Maximum characters for a Scriban <c>include</c> partial (.html under the template folder).</summary>
     public int MaxTemplatePartialChars { get; init; } = 200_000;
+
+    /// <summary>Maximum bytes for a PUT /templates/{id} zip pack.</summary>
+    public int MaxTemplatePackBytes { get; init; } = 2 * 1024 * 1024;
 }

@@ -1,5 +1,6 @@
 using OxyKit.Render.Contracts;
 using OxyKit.Render.Core;
+using OxyKit.Render.Core.Inputs;
 
 namespace OxyKit.Render.Api.Endpoints;
 
@@ -44,6 +45,242 @@ internal static class RenderEndpoints
             .Produces<TemplatesResponse>(StatusCodes.Status200OK)
             .Produces<ErrorResponse>(StatusCodes.Status401Unauthorized)
             .Produces<ErrorResponse>(StatusCodes.Status403Forbidden);
+
+        endpoints
+            .MapGet(
+                "/templates/{templateId}",
+                (string templateId, TemplateStore templateStore) =>
+                {
+                    try
+                    {
+                        var detail = templateStore.Describe(templateId);
+                        return Results.Ok(
+                            new TemplateDetailResponse(detail.Id, detail.HasContract, detail.Files)
+                        );
+                    }
+                    catch (ArgumentException ex)
+                    {
+                        return TemplateError(ex);
+                    }
+                }
+            )
+            .WithName(Name("GetTemplate"))
+            .WithSummary("Get template pack metadata")
+            .WithDescription(
+                "Returns file list for a template id under Rendering:TemplatesRoot. "
+                    + "Does not return file contents — use GET /templates/{id}/pack for a zip download."
+            )
+            .Produces<TemplateDetailResponse>(StatusCodes.Status200OK)
+            .Produces<ErrorResponse>(StatusCodes.Status400BadRequest)
+            .Produces<ErrorResponse>(StatusCodes.Status401Unauthorized)
+            .Produces<ErrorResponse>(StatusCodes.Status403Forbidden)
+            .Produces<ErrorResponse>(StatusCodes.Status404NotFound);
+
+        endpoints
+            .MapGet(
+                "/templates/{templateId}/pack",
+                async (
+                    string templateId,
+                    TemplateStore templateStore,
+                    CancellationToken cancellationToken
+                ) =>
+                {
+                    try
+                    {
+                        var stream = new MemoryStream();
+                        await templateStore.WriteZipAsync(templateId, stream, cancellationToken);
+                        stream.Position = 0;
+                        return Results.File(
+                            stream,
+                            "application/zip",
+                            fileDownloadName: $"{templateId}.zip"
+                        );
+                    }
+                    catch (ArgumentException ex)
+                    {
+                        return TemplateError(ex);
+                    }
+                }
+            )
+            .WithName(Name("GetTemplatePack"))
+            .WithSummary("Download template pack zip")
+            .WithDescription(
+                "Zips template.html, contract.json, and optional assets/, partials/, sample-data.json."
+            )
+            .Produces(StatusCodes.Status200OK, contentType: "application/zip")
+            .Produces<ErrorResponse>(StatusCodes.Status400BadRequest)
+            .Produces<ErrorResponse>(StatusCodes.Status401Unauthorized)
+            .Produces<ErrorResponse>(StatusCodes.Status403Forbidden)
+            .Produces<ErrorResponse>(StatusCodes.Status404NotFound);
+
+        endpoints
+            .MapPut(
+                "/templates/{templateId}",
+                async (
+                    string templateId,
+                    HttpRequest request,
+                    TemplateStore templateStore,
+                    CancellationToken cancellationToken
+                ) =>
+                {
+                    try
+                    {
+                        var contentType = request.ContentType ?? "";
+                        if (
+                            !contentType.Contains("application/zip", StringComparison.OrdinalIgnoreCase)
+                            && !contentType.Contains(
+                                "application/x-zip-compressed",
+                                StringComparison.OrdinalIgnoreCase
+                            )
+                            && !contentType.Contains(
+                                "application/octet-stream",
+                                StringComparison.OrdinalIgnoreCase
+                            )
+                        )
+                        {
+                            return Results.BadRequest(
+                                new ErrorResponse(
+                                    "Content-Type must be application/zip (or application/octet-stream)."
+                                )
+                            );
+                        }
+
+                        var info = await templateStore.SaveFromZipAsync(
+                            templateId,
+                            request.Body,
+                            cancellationToken
+                        );
+                        return Results.Ok(new TemplateListItem(info.Id, info.HasContract));
+                    }
+                    catch (ArgumentException ex)
+                    {
+                        return TemplateError(ex);
+                    }
+                    catch (InvalidDataException ex)
+                    {
+                        return Results.BadRequest(new ErrorResponse(ex.Message));
+                    }
+                }
+            )
+            .WithName(Name("PutTemplate"))
+            .WithSummary("Upload or replace a template pack")
+            .WithDescription(
+                "Accepts a zip whose root (or single top-level folder) contains template.html + contract.json; "
+                    + "optional sample-data.json, partials/*.html, assets/* (png/jpg/gif/webp/svg). "
+                    + "Replace-in-place under Rendering:TemplatesRoot. Trusted template markup — API key required."
+            )
+            .Produces<TemplateListItem>(StatusCodes.Status200OK)
+            .Produces<ErrorResponse>(StatusCodes.Status400BadRequest)
+            .Produces<ErrorResponse>(StatusCodes.Status401Unauthorized)
+            .Produces<ErrorResponse>(StatusCodes.Status403Forbidden)
+            .DisableAntiforgery();
+
+        endpoints
+            .MapDelete(
+                "/templates/{templateId}",
+                async (
+                    string templateId,
+                    TemplateStore templateStore,
+                    CancellationToken cancellationToken
+                ) =>
+                {
+                    try
+                    {
+                        await templateStore.DeleteAsync(templateId, cancellationToken);
+                        return Results.NoContent();
+                    }
+                    catch (ArgumentException ex)
+                    {
+                        return TemplateError(ex);
+                    }
+                }
+            )
+            .WithName(Name("DeleteTemplate"))
+            .WithSummary("Delete a template pack")
+            .WithDescription("Removes the template directory under Rendering:TemplatesRoot.")
+            .Produces(StatusCodes.Status204NoContent)
+            .Produces<ErrorResponse>(StatusCodes.Status400BadRequest)
+            .Produces<ErrorResponse>(StatusCodes.Status401Unauthorized)
+            .Produces<ErrorResponse>(StatusCodes.Status403Forbidden)
+            .Produces<ErrorResponse>(StatusCodes.Status404NotFound);
+
+        endpoints
+            .MapPut(
+                "/templates/{templateId}/assets/{*assetPath}",
+                async (
+                    string templateId,
+                    string assetPath,
+                    HttpRequest request,
+                    TemplateStore templateStore,
+                    CancellationToken cancellationToken
+                ) =>
+                {
+                    try
+                    {
+                        var path = await templateStore.SaveAssetAsync(
+                            templateId,
+                            assetPath,
+                            request.Body,
+                            cancellationToken
+                        );
+                        return Results.Ok(new TemplateAssetResponse(templateId, path));
+                    }
+                    catch (ArgumentException ex)
+                    {
+                        return TemplateError(ex);
+                    }
+                }
+            )
+            .WithName(Name("PutTemplateAsset"))
+            .WithSummary("Upload or replace a template asset")
+            .WithDescription(
+                "Writes an image under the pack's assets/ folder. Path is a label or relative name "
+                    + "(e.g. logo.svg or brand/logo.png); optional assets/ prefix is normalized away. "
+                    + "Use the returned path with {{ asset \"assets/…\" }}. Allowlisted: png/jpg/gif/webp/svg. "
+                    + "Max size: Rendering:MaxTemplateAssetBytes."
+            )
+            .Produces<TemplateAssetResponse>(StatusCodes.Status200OK)
+            .Produces<ErrorResponse>(StatusCodes.Status400BadRequest)
+            .Produces<ErrorResponse>(StatusCodes.Status401Unauthorized)
+            .Produces<ErrorResponse>(StatusCodes.Status403Forbidden)
+            .Produces<ErrorResponse>(StatusCodes.Status404NotFound)
+            .DisableAntiforgery();
+
+        endpoints
+            .MapDelete(
+                "/templates/{templateId}/assets/{*assetPath}",
+                async (
+                    string templateId,
+                    string assetPath,
+                    TemplateStore templateStore,
+                    CancellationToken cancellationToken
+                ) =>
+                {
+                    try
+                    {
+                        await templateStore.DeleteAssetAsync(
+                            templateId,
+                            assetPath,
+                            cancellationToken
+                        );
+                        return Results.NoContent();
+                    }
+                    catch (ArgumentException ex)
+                    {
+                        return TemplateError(ex);
+                    }
+                }
+            )
+            .WithName(Name("DeleteTemplateAsset"))
+            .WithSummary("Delete a template asset")
+            .WithDescription(
+                "Removes one file under assets/. Same path rules as PUT (label or assets/-prefixed)."
+            )
+            .Produces(StatusCodes.Status204NoContent)
+            .Produces<ErrorResponse>(StatusCodes.Status400BadRequest)
+            .Produces<ErrorResponse>(StatusCodes.Status401Unauthorized)
+            .Produces<ErrorResponse>(StatusCodes.Status403Forbidden)
+            .Produces<ErrorResponse>(StatusCodes.Status404NotFound);
 
         endpoints
             .MapPost(
@@ -335,5 +572,15 @@ internal static class RenderEndpoints
                 statusCode: StatusCodes.Status500InternalServerError
             );
         }
+    }
+
+    private static IResult TemplateError(ArgumentException ex)
+    {
+        if (ex.Message.Contains("was not found", StringComparison.OrdinalIgnoreCase))
+        {
+            return Results.NotFound(new ErrorResponse(ex.Message));
+        }
+
+        return Results.BadRequest(new ErrorResponse(ex.Message));
     }
 }

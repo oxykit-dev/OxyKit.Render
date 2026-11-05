@@ -1,3 +1,4 @@
+using System.IO.Compression;
 using System.Net;
 using System.Net.Http.Json;
 using System.Text;
@@ -666,11 +667,204 @@ public sealed class RenderApiTests(WebApplicationFactory<Program> factory)
         Assert.Contains("not found", payload!.Error, StringComparison.OrdinalIgnoreCase);
     }
 
+    [Fact]
+    public async Task TemplatePack_PutGetDelete_RoundTrip()
+    {
+        var templatesRoot = Path.Combine(
+            Path.GetTempPath(),
+            "oxykit-api-templates-" + Guid.NewGuid().ToString("N")
+        );
+        Directory.CreateDirectory(templatesRoot);
+        try
+        {
+            using var factory = _factory.WithWebHostBuilder(builder =>
+            {
+                builder.UseSetting("Rendering:TemplatesRoot", templatesRoot);
+            });
+            var client = factory.CreateClient();
+            client.DefaultRequestHeaders.Add("X-OxyKit-Render-Key", "test-key");
+
+            await using var zip = CreateMinimalPackZip();
+            using var putContent = new StreamContent(zip);
+            putContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(
+                "application/zip"
+            );
+
+            var put = await client.PutAsync(
+                "/templates/demo",
+                putContent,
+                TestContext.Current.CancellationToken
+            );
+            Assert.Equal(HttpStatusCode.OK, put.StatusCode);
+
+            var detail = await client.GetAsync(
+                "/templates/demo",
+                TestContext.Current.CancellationToken
+            );
+            Assert.Equal(HttpStatusCode.OK, detail.StatusCode);
+            var meta = await detail.Content.ReadFromJsonAsync<TemplateDetailPayload>(
+                TestContext.Current.CancellationToken
+            );
+            Assert.Equal("demo", meta!.Id);
+            Assert.True(meta.HasContract);
+            Assert.Contains(meta.Files, f => f == "template.html");
+
+            var pack = await client.GetAsync(
+                "/templates/demo/pack",
+                TestContext.Current.CancellationToken
+            );
+            Assert.Equal(HttpStatusCode.OK, pack.StatusCode);
+            Assert.Equal("application/zip", pack.Content.Headers.ContentType?.MediaType);
+
+            var delete = await client.DeleteAsync(
+                "/templates/demo",
+                TestContext.Current.CancellationToken
+            );
+            Assert.Equal(HttpStatusCode.NoContent, delete.StatusCode);
+
+            var missing = await client.GetAsync(
+                "/templates/demo",
+                TestContext.Current.CancellationToken
+            );
+            Assert.Equal(HttpStatusCode.NotFound, missing.StatusCode);
+        }
+        finally
+        {
+            if (Directory.Exists(templatesRoot))
+            {
+                Directory.Delete(templatesRoot, recursive: true);
+            }
+        }
+    }
+
+    [Fact]
+    public async Task TemplateDetail_InvoiceSample()
+    {
+        var client = _factory.CreateClient();
+        client.DefaultRequestHeaders.Add("X-OxyKit-Render-Key", "test-key");
+
+        var response = await client.GetAsync(
+            "/templates/invoice",
+            TestContext.Current.CancellationToken
+        );
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var meta = await response.Content.ReadFromJsonAsync<TemplateDetailPayload>(
+            TestContext.Current.CancellationToken
+        );
+        Assert.Equal("invoice", meta!.Id);
+        Assert.True(meta.HasContract);
+        Assert.Contains(meta.Files, f => f == "template.html");
+        Assert.Contains(meta.Files, f => f.StartsWith("partials/", StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public async Task TemplateAsset_PutAndDelete()
+    {
+        var templatesRoot = Path.Combine(
+            Path.GetTempPath(),
+            "oxykit-api-assets-" + Guid.NewGuid().ToString("N")
+        );
+        Directory.CreateDirectory(templatesRoot);
+        try
+        {
+            using var factory = _factory.WithWebHostBuilder(builder =>
+            {
+                builder.UseSetting("Rendering:TemplatesRoot", templatesRoot);
+            });
+            var client = factory.CreateClient();
+            client.DefaultRequestHeaders.Add("X-OxyKit-Render-Key", "test-key");
+
+            await using var zip = CreateMinimalPackZip();
+            using var putPack = new StreamContent(zip);
+            putPack.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(
+                "application/zip"
+            );
+            Assert.Equal(
+                HttpStatusCode.OK,
+                (
+                    await client.PutAsync(
+                        "/templates/demo",
+                        putPack,
+                        TestContext.Current.CancellationToken
+                    )
+                ).StatusCode
+            );
+
+            using var assetBody = new ByteArrayContent(
+                Encoding.UTF8.GetBytes("<svg xmlns='http://www.w3.org/2000/svg'/>")
+            );
+            assetBody.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(
+                "image/svg+xml"
+            );
+            var putAsset = await client.PutAsync(
+                "/templates/demo/assets/logo.svg",
+                assetBody,
+                TestContext.Current.CancellationToken
+            );
+            Assert.Equal(HttpStatusCode.OK, putAsset.StatusCode);
+            var asset = await putAsset.Content.ReadFromJsonAsync<TemplateAssetPayload>(
+                TestContext.Current.CancellationToken
+            );
+            Assert.Equal("assets/logo.svg", asset!.Path);
+
+            var detail = await client.GetAsync(
+                "/templates/demo",
+                TestContext.Current.CancellationToken
+            );
+            var meta = await detail.Content.ReadFromJsonAsync<TemplateDetailPayload>(
+                TestContext.Current.CancellationToken
+            );
+            Assert.Contains(meta!.Files, f => f == "assets/logo.svg");
+
+            var del = await client.DeleteAsync(
+                "/templates/demo/assets/logo.svg",
+                TestContext.Current.CancellationToken
+            );
+            Assert.Equal(HttpStatusCode.NoContent, del.StatusCode);
+        }
+        finally
+        {
+            if (Directory.Exists(templatesRoot))
+            {
+                Directory.Delete(templatesRoot, recursive: true);
+            }
+        }
+    }
+
+    private static MemoryStream CreateMinimalPackZip()
+    {
+        var ms = new MemoryStream();
+        using (var archive = new ZipArchive(ms, ZipArchiveMode.Create, leaveOpen: true))
+        {
+            using (var w = new StreamWriter(archive.CreateEntry("template.html").Open()))
+            {
+                w.Write("<p>{{ name }}</p>");
+            }
+
+            using (var w = new StreamWriter(archive.CreateEntry("contract.json").Open()))
+            {
+                w.Write("""{"type":"object"}""");
+            }
+        }
+
+        ms.Position = 0;
+        return ms;
+    }
+
     private sealed record FormatsPayload(IReadOnlyCollection<string> Formats);
 
     private sealed record TemplatesPayload(IReadOnlyList<TemplateItem> Templates);
 
     private sealed record TemplateItem(string Id, bool HasContract);
+
+    private sealed record TemplateDetailPayload(
+        string Id,
+        bool HasContract,
+        IReadOnlyList<string> Files
+    );
+
+    private sealed record TemplateAssetPayload(string TemplateId, string Path);
 
     private sealed record ErrorPayload(string Error);
 }

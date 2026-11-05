@@ -33,7 +33,8 @@ internal sealed class RenderDocumentTransformer(IOptions<SecurityOptions> securi
             Title = "OxyKit.Render API",
             Version = "v1",
             Description =
-                "HTTP API that renders documents to PDF, Excel, CSV, and HTML (csv/pdf, csv/xlsx, html/pdf, table/html, table/pdf, table/xlsx, table/csv, template/html, template/pdf).",
+                "HTTP API that renders documents to PDF, Excel, CSV, and HTML (csv/pdf, csv/xlsx, html/pdf, table/html, table/pdf, table/xlsx, table/csv, template/html, template/pdf). "
+                + "Auth: API key (machines) or Bearer JWT issued by OxyKit.Mail (humans).",
         };
 
         var apiKeyHeader = securityOptions.Value.ApiKeyHeader;
@@ -44,7 +45,15 @@ internal sealed class RenderDocumentTransformer(IOptions<SecurityOptions> securi
             Type = SecuritySchemeType.ApiKey,
             In = ParameterLocation.Header,
             Name = apiKeyHeader,
-            Description = $"API key required in the `{apiKeyHeader}` header.",
+            Description = $"API key required in the `{apiKeyHeader}` header (machine clients).",
+        };
+        document.Components.SecuritySchemes["Bearer"] = new OpenApiSecurityScheme
+        {
+            Type = SecuritySchemeType.Http,
+            Scheme = "bearer",
+            BearerFormat = "JWT",
+            Description =
+                "Mail-issued JWT (Authorization: Bearer). Admin for pack write; Admin|User for pack read; Admin|User|Sender for render.",
         };
 
         foreach (var (path, pathItem) in document.Paths)
@@ -71,6 +80,12 @@ internal sealed class RenderDocumentTransformer(IOptions<SecurityOptions> securi
                         [new OpenApiSecuritySchemeReference("ApiKey", document)] = [],
                     }
                 );
+                operation.Security.Add(
+                    new OpenApiSecurityRequirement
+                    {
+                        [new OpenApiSecuritySchemeReference("Bearer", document)] = [],
+                    }
+                );
 
                 EnsureAuthErrorResponses(operation);
             }
@@ -86,7 +101,8 @@ internal sealed class RenderDocumentTransformer(IOptions<SecurityOptions> securi
             "401",
             new OpenApiResponse
             {
-                Description = "Missing or invalid API key. Body: `{ \"error\": \"...\" }`.",
+                Description =
+                    "Missing or invalid API key / Bearer token. Body: `{ \"error\": \"...\" }`.",
             }
         );
         operation.Responses.TryAdd(
@@ -94,7 +110,7 @@ internal sealed class RenderDocumentTransformer(IOptions<SecurityOptions> securi
             new OpenApiResponse
             {
                 Description =
-                    "Non-local client while Security:RequireLocalRequests is true. Body: `{ \"error\": \"...\" }`.",
+                    "Non-local client while Security:RequireLocalRequests is true, or insufficient JWT role. Body: `{ \"error\": \"...\" }`.",
             }
         );
     }
