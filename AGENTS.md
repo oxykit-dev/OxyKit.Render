@@ -131,6 +131,10 @@ Shared lib (NuGet): `OxyKit.Observability` only — see [Observability AGENTS](h
 
 `Security:RequireLocalRequests`, `ApiKeyHeader`, `ApiKey` (startup fails if missing / `change-me-in-production`); optional `Security:Jwt:Key|Issuer|Audience` (same as Mail `Jwt:*` for human Bearer); `Rendering:MaxHtmlContentChars`, `MaxCsvContentChars`, `MaxRequestBodyBytes`, `MaxConcurrentRenders`, `TemplatesRoot`, `MaxTemplateChars`, `MaxContractChars`, `MaxTemplateAssetBytes`, `MaxTemplatePartialChars`, `MaxTemplatePackBytes`; `Logging:JsonConsole`. Templates on disk: `templates/{id}/template.html` + `contract.json` (required); optional `assets/` (`asset` helper), `partials/` (`include`); `sample-data.json` is demo-only (not loaded by the engine). Compose mounts `TemplatesRoot` at `/data/templates` (seed from image when empty). Table/CSV limits: `TableWorkbookConstraints`. Pack write path: `Core/Inputs/TemplatePack.cs` (partial `TemplateStore`).
 
+## Docker image
+
+`Dockerfile` (context = repo root) + `.github/workflows/docker.yml` publish `ghcr.io/oxykit-dev/oxykit-render` for linux/amd64 + arm64: `v*` tag → `X.Y.Z`, `X.Y`, `latest`; `master` → `edge`; every build → `sha-<short>`. PRs build without pushing. The Compose stack + smoke test live in [oxykit-compose](https://github.com/oxykit-dev/oxykit-compose).
+
 ## Docs policy for agents
 
 - Prefer this file over dumping README / OpenAPI / Hoppscotch JSON.
