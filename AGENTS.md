@@ -6,9 +6,9 @@ Token-efficient map. Prefer this over exploring the tree or loading the full REA
 
 **OxyKit** suite core. **MIT** · host version on Api + Core; Client/Contracts packable (nuget.org via Trusted Publishing / `release-nuget.yml` when their `<Version>` matches the tag). Core host-internal (`IsPackable=false`). See `docs/NUGET_PUBLISH.md`.
 
-.NET 10 Minimal API **document render sidecar**: clients POST JSON -> PDF / XLSX / CSV / HTML. Local + API key by default. Shared contracts + HttpClient SDK for Local and suite consumers (e.g. **OxyKit.Flow**).
+.NET 10 Minimal API **document render sidecar**: clients POST JSON -> PDF / XLSX / CSV / HTML. API key by default (optional Mail JWT). Shared contracts + HttpClient SDK for suite consumers (e.g. **OxyKit.Flow**).
 
-**Host choice:** stay on **Minimal APIs** (not FastEndpoints). Suite priority here is **resources + AOT-friendliness**; Mail/Flow use FE+ErrorOr for DX. Binary file responses and dual `/` + `/v1` `MapGroup` fit this stack.
+**Host choice:** stay on **Minimal APIs** (not FastEndpoints). Suite priority here is **resources** (thin, few deps; not AOT-published — Scriban/ClosedXML and reflection JSON); Mail/Flow use FE+ErrorOr for DX. Binary file responses and dual `/` + `/v1` `MapGroup` fit this stack.
 
 ## Open these files first
 
@@ -125,7 +125,7 @@ Hoppscotch: import `hoppscotch/*`, env **OxyKit.Render Local**, run folders in o
 Shared lib (NuGet): `OxyKit.Observability` only — see [Observability AGENTS](https://github.com/oxykit-dev/OxyKit.Observability/blob/master/AGENTS.md).
 
 - `AddOxyKitJsonConsole` + `UseOxyKitCorrelation`
-- **Do not** reference `OxyKit.OpenTelemetry` (AOT/size)
+- **Do not** reference `OxyKit.OpenTelemetry` (size)
 
 ## Config knobs
 
