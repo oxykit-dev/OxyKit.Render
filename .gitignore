@@ -487,3 +487,7 @@ $RECYCLE.BIN/
 
 # Cloud local artifact store (when scaffolded in-tree)
 phaseflow-cloud/data/
+
+# Local agent/editor rules (not tracked)
+.cursor/
+.devin/

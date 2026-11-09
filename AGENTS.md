@@ -26,7 +26,7 @@ Token-efficient map. Prefer this over exploring the tree or loading the full REA
 | OpenAPI shapes | `Api/OpenApi/RenderRequestSchemaTransformers.cs` |
 | Tests | `tests/OxyKit.Render.Api.Tests/`, `tests/OxyKit.Render.Client.Tests/` |
 | Hoppscotch | `hoppscotch/` (do not paste JSON into chat) |
-| Cursor rules | `.cursor/rules/` |
+| Local agent rules (gitignored) | `.devin/rules/` |
 
 Ignore `bin/`, `obj/`, `output/`, `TestResults/`, and copied `appsettings` under test output.
 

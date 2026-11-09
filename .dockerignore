@@ -2,6 +2,7 @@
 **/obj/
 **/.git/
 **/.cursor/
+**/.devin/
 **/TestResults/
 **/hoppscotch/
 **/*.md
