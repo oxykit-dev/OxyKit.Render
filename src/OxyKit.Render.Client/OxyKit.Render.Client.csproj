@@ -4,7 +4,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <RootNamespace>OxyKit.Render.Client</RootNamespace>
-    <Description>Typed HttpClient SDK for OxyKit.Render Local and Cloud APIs.</Description>
+    <Description>Typed HttpClient SDK for the OxyKit.Render API.</Description>
     <PackageId>OxyKit.Render.Client</PackageId>
     <Version>0.1.4</Version>
     <Authors>OxyKit.Render</Authors>

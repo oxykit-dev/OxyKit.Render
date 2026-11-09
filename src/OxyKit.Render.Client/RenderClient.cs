@@ -12,7 +12,7 @@ public sealed class RenderClientOptions
     /// <summary>Base URL including trailing slash preference — e.g. http://localhost:5066/ or https://api.example.com/v1/</summary>
     public required Uri BaseAddress { get; init; }
 
-    /// <summary>Local uses X-OxyKit-Render-Key; Cloud uses Bearer. Set one.</summary>
+    /// <summary>API key (X-OxyKit-Render-Key) or a Mail-issued JWT with <see cref="UseBearerAuth"/>.</summary>
     public string? ApiKey { get; init; }
 
     /// <summary>Header name for Local API key auth. Default X-OxyKit-Render-Key.</summary>
@@ -49,7 +49,7 @@ public sealed class RenderFileResult
     }
 }
 
-/// <summary>Thin HttpClient SDK for OxyKit.Render Local (and later Cloud) APIs.</summary>
+/// <summary>Thin HttpClient SDK for the OxyKit.Render API.</summary>
 public sealed class RenderClient : IDisposable
 {
     private static readonly JsonSerializerOptions JsonOptions = new()
@@ -182,71 +182,6 @@ public sealed class RenderClient : IDisposable
         var path =
             $"render/{Uri.EscapeDataString(input.Trim())}/{Uri.EscapeDataString(output.Trim())}";
         return PostRenderAsync(path, body, cancellationToken);
-    }
-
-    /// <summary>Cloud: fetch document provenance metadata.</summary>
-    public Task<DocumentRecord> GetDocumentAsync(
-        string documentId,
-        CancellationToken cancellationToken = default
-    ) =>
-        GetJsonAsync<DocumentRecord>(
-            $"documents/{Uri.EscapeDataString(documentId)}",
-            cancellationToken
-        );
-
-    /// <summary>Cloud: verify bytes against the recorded SHA-256.</summary>
-    public async Task<VerifyDocumentResponse> VerifyDocumentAsync(
-        string documentId,
-        byte[] content,
-        CancellationToken cancellationToken = default
-    )
-    {
-        var sha = Convert.ToHexString(SHA256.HashData(content)).ToLowerInvariant();
-        using var response = await _http
-            .PostAsJsonAsync(
-                $"documents/{Uri.EscapeDataString(documentId)}/verify",
-                new { sha256 = sha },
-                JsonOptions,
-                cancellationToken
-            )
-            .ConfigureAwait(false);
-        return await ReadJsonAsync<VerifyDocumentResponse>(response, cancellationToken)
-            .ConfigureAwait(false);
-    }
-
-    /// <summary>Cloud: register an external file (upload). Retention of bytes is opt-in.</summary>
-    public async Task<DocumentRecord> RegisterDocumentAsync(
-        Stream content,
-        string contentType,
-        RetentionOptions? retention = null,
-        CancellationToken cancellationToken = default
-    )
-    {
-        using var form = new MultipartFormDataContent();
-        var streamContent = new StreamContent(content);
-        streamContent.Headers.ContentType = new MediaTypeHeaderValue(contentType);
-        form.Add(streamContent, "file", "document");
-        if (retention is not null)
-        {
-            form.Add(
-                new StringContent(retention.RetainArtifact ? "true" : "false"),
-                "retainArtifact"
-            );
-            form.Add(
-                new StringContent(retention.RetainTemplate ? "true" : "false"),
-                "retainTemplate"
-            );
-            form.Add(
-                new StringContent(retention.RetainPayload ? "true" : "false"),
-                "retainPayload"
-            );
-        }
-
-        using var response = await _http
-            .PostAsync("documents/register", form, cancellationToken)
-            .ConfigureAwait(false);
-        return await ReadJsonAsync<DocumentRecord>(response, cancellationToken)
-            .ConfigureAwait(false);
     }
 
     public void Dispose()

@@ -2,6 +2,12 @@
 
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [Unreleased]
+
+### Removed
+
+- `RenderClient.GetDocumentAsync`, `VerifyDocumentAsync`, `RegisterDocumentAsync` and their Contracts types (`DocumentRecord`, `DocumentSource`, `RetentionOptions`, `RegisterDocumentRequest`, `VerifyDocumentResponse`). Streamlines the SDK to the render, template, format, and health endpoints the API serves. Breaking for Client/Contracts.
+
 ## [0.1.6] - 2026-11-06
 
 ### Added

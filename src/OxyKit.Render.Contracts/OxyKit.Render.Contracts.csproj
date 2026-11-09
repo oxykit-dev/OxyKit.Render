@@ -4,7 +4,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <RootNamespace>OxyKit.Render.Contracts</RootNamespace>
-    <Description>Shared request/response contracts for OxyKit.Render Local and Cloud.</Description>
+    <Description>Shared request/response contracts for the OxyKit.Render API.</Description>
     <PackageId>OxyKit.Render.Contracts</PackageId>
     <Version>0.1.4</Version>
     <Authors>OxyKit.Render</Authors>
