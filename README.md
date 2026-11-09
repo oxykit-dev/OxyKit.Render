@@ -29,8 +29,8 @@ dotnet run --project src/OxyKit.Render.Api
 | `/formats`, `/templates`, `/render/{input}/{output}` | Authenticated (+ `/v1/...` aliases) |
 
 ```bash
-dotnet test tests/OxyKit.Render.Api.Tests/OxyKit.Render.Api.Tests.csproj
-dotnet test tests/OxyKit.Render.Client.Tests/OxyKit.Render.Client.Tests.csproj
+dotnet test --project tests/OxyKit.Render.Api.Tests/OxyKit.Render.Api.Tests.csproj
+dotnet test --project tests/OxyKit.Render.Client.Tests/OxyKit.Render.Client.Tests.csproj
 ```
 
 **Smoke:** import [`hoppscotch/`](./hoppscotch/) collection + env → **OxyKit.Render Local** → run folders in order.

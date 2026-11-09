@@ -113,8 +113,8 @@ Validation failures -> `ArgumentException` / `NotSupportedException` -> HTTP 400
 ```bash
 cd OxyKit.Render
 dotnet run --project src/OxyKit.Render.Api          # :5066
-dotnet test tests/OxyKit.Render.Api.Tests/OxyKit.Render.Api.Tests.csproj
-dotnet test tests/OxyKit.Render.Client.Tests/OxyKit.Render.Client.Tests.csproj
+dotnet test --project tests/OxyKit.Render.Api.Tests/OxyKit.Render.Api.Tests.csproj
+dotnet test --project tests/OxyKit.Render.Client.Tests/OxyKit.Render.Client.Tests.csproj
 ```
 
 Dev key: `X-OxyKit-Render-Key: dev-local-key`.  
