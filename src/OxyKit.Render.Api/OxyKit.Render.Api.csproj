@@ -16,7 +16,7 @@
     <PackageReference Include="Microsoft.OpenApi" Version="2.12.2" />
     <PackageReference Include="OxyKit.Observability" Version="0.1.1" />
     <PackageReference Include="Scalar.AspNetCore" Version="2.18.7" />
-    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.19.2" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.23.0" />
   </ItemGroup>
 
   <ItemGroup>
