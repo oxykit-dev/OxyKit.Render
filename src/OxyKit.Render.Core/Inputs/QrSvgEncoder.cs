@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Globalization;
 using System.Text;
 using QRCoder;
 
@@ -53,14 +52,20 @@ internal static class QrSvgEncoder
         var edgePx = Math.Min(modules * pixelsPerModule, MaxDisplayEdgePx);
 
         var sb = new StringBuilder(256 + modules * modules);
-        sb.Append(
-            CultureInfo.InvariantCulture,
-            $"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"{edgePx}\" height=\"{edgePx}\" viewBox=\"0 0 {modules} {modules}\" shape-rendering=\"crispEdges\" role=\"img\">"
-        );
-        sb.Append(
-            CultureInfo.InvariantCulture,
-            $"<rect width=\"{modules}\" height=\"{modules}\" fill=\"#fff\"/>"
-        );
+        sb.Append("<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"");
+        sb.Append(edgePx);
+        sb.Append("\" height=\"");
+        sb.Append(edgePx);
+        sb.Append("\" viewBox=\"0 0 ");
+        sb.Append(modules);
+        sb.Append(' ');
+        sb.Append(modules);
+        sb.Append("\" shape-rendering=\"crispEdges\" role=\"img\">");
+        sb.Append("<rect width=\"");
+        sb.Append(modules);
+        sb.Append("\" height=\"");
+        sb.Append(modules);
+        sb.Append("\" fill=\"#fff\"/>");
 
         for (var y = 0; y < modules; y++)
         {
@@ -73,11 +78,7 @@ internal static class QrSvgEncoder
                     runStart = x;
                 else if (!black && runStart >= 0)
                 {
-                    var runWidth = x - runStart;
-                    sb.Append(
-                        CultureInfo.InvariantCulture,
-                        $"<rect x=\"{runStart}\" y=\"{y}\" width=\"{runWidth}\" height=\"1\" fill=\"#000\"/>"
-                    );
+                    SvgMarkup.AppendBlackRect(sb, runStart, y, x - runStart, 1);
                     runStart = -1;
                 }
             }

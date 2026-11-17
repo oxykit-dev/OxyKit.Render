@@ -5,9 +5,12 @@ namespace OxyKit.Render.Core.Outputs;
 
 internal static class TableHtmlBuilder
 {
+    // Fixed chrome around sheet content (doctype/head/style close/body open/close).
+    private const int FixedChromeChars = 512;
+
     public static string Build(ValidatedWorkbook workbook)
     {
-        var html = new StringBuilder();
+        var html = new StringBuilder(EstimateCapacity(workbook));
         html.Append("<!DOCTYPE html><html lang=\"en\"><head>");
         html.Append("<meta charset=\"utf-8\"/>");
         html.Append("<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"/>");
@@ -51,6 +54,22 @@ internal static class TableHtmlBuilder
 
         html.Append("</body></html>");
         return html.ToString();
+    }
+
+    private static int EstimateCapacity(ValidatedWorkbook workbook)
+    {
+        var cells = 0;
+        foreach (var sheet in workbook.Sheets)
+        {
+            cells += sheet.Headers.Count;
+            foreach (var row in sheet.Rows)
+            {
+                cells += row.Count;
+            }
+        }
+
+        // ~24 chars of tags per cell + modest text payload; plus print CSS once.
+        return FixedChromeChars + PrintBaselineCss.Content.Length + cells * 32;
     }
 
     private static string HtmlEncode(string value) => WebUtility.HtmlEncode(value);

@@ -18,7 +18,7 @@ Token-efficient map. Prefer this over exploring the tree or loading the full REA
 | Request DTOs / public shapes | `OxyKit.Render.Contracts/` |
 | Typed HTTP SDK | `OxyKit.Render.Client/RenderClient.cs` |
 | Table/CSV limits & typing | `Core/Inputs/TableWorkbookConstraints.cs`, `Core/IsoDateCell.cs`, `Core/Inputs/CsvTableParser.cs` |
-| Templates | `Core/Inputs/TemplateStore.cs`, `TemplateDataValidator.cs`, `ScribanTemplateRenderer.cs`, `TemplateQrFunctions.cs`, `TemplateFormatFunctions.cs`, `TemplateAssetFunctions.cs`, `TemplateFileLoader.cs`, `QrSvgEncoder.cs`, `BarcodeSvgEncoder.cs` |
+| Templates | `Core/Inputs/TemplateStore.cs` (pack cache + stamp invalidate), `TemplatePack.cs`, `TemplateDataValidator.cs`, `ScribanTemplateRenderer.cs`, `TemplateQrFunctions.cs`, `TemplateFormatFunctions.cs`, `TemplateAssetFunctions.cs`, `TemplateFileLoader.cs`, `QrSvgEncoder.cs`, `BarcodeSvgEncoder.cs` |
 | PDF | `Core/Outputs/HtmlToPdfRenderer.cs`, `PdfPageOptions.cs`, `Contracts/PdfPageEnums.cs` |
 | Print CSS | `Core/assets/print-baseline.css`, `Outputs/PrintBaselineInjector.cs` |
 | Auth | `Api/Security/InternalAccessMiddleware.cs` |

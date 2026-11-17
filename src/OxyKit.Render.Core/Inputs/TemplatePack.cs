@@ -83,6 +83,7 @@ internal sealed partial class TemplateStore
                     TryDeleteDirectory(backup);
                 }
 
+                Invalidate(id);
                 var hasContract = File.Exists(Path.Combine(target, "contract.json"));
                 return new TemplateInfo(id, hasContract);
             }
@@ -114,6 +115,7 @@ internal sealed partial class TemplateStore
             }
 
             TryDeleteDirectory(dir);
+            Invalidate(id);
         }
         finally
         {

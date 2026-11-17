@@ -7,6 +7,11 @@ Format: [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Added
 
 - `Dockerfile` + `.github/workflows/docker.yml`: multi-arch image `ghcr.io/oxykit-dev/oxykit-render` (release tags, `edge` from master)
+- Template pack cache: `TemplateStore` keeps HTML + contract + parsed Scriban in memory; refreshes on pack zip/delete and when on-disk mtime/size stamps change
+
+### Changed
+
+- Low-cost Core buffer/string assembly (then simplified): cached print-baseline style block; table HTML/CSV `StringBuilder` capacity; span CSV parse (`GetRange` / BOM); `ScriptArray` capacity; stackalloc `IsoDateCell.Format(DateTime)`; shared `SvgMarkup.AppendBlackRect` for QR/barcode
 
 ### Removed
 

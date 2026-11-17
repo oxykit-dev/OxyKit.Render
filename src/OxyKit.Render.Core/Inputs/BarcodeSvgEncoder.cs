@@ -1,4 +1,3 @@
-using System.Globalization;
 using System.Text;
 using Barcoder;
 using Barcoder.Code128;
@@ -97,14 +96,14 @@ internal static class BarcodeSvgEncoder
             : $"width=\"{widthPx}\" height=\"{heightPx}\" viewBox=\"0 0 {moduleWidth} {viewHeight}\"";
 
         var sb = new StringBuilder(256 + moduleWidth * 24);
-        sb.Append(
-            CultureInfo.InvariantCulture,
-            $"<svg xmlns=\"http://www.w3.org/2000/svg\" {sizeAttrs} shape-rendering=\"crispEdges\" role=\"img\">"
-        );
-        sb.Append(
-            CultureInfo.InvariantCulture,
-            $"<rect width=\"{moduleWidth}\" height=\"{viewHeight}\" fill=\"#fff\"/>"
-        );
+        sb.Append("<svg xmlns=\"http://www.w3.org/2000/svg\" ");
+        sb.Append(sizeAttrs);
+        sb.Append(" shape-rendering=\"crispEdges\" role=\"img\">");
+        sb.Append("<rect width=\"");
+        sb.Append(moduleWidth);
+        sb.Append("\" height=\"");
+        sb.Append(viewHeight);
+        sb.Append("\" fill=\"#fff\"/>");
 
         for (var y = 0; y < moduleHeight; y++)
         {
@@ -116,11 +115,7 @@ internal static class BarcodeSvgEncoder
                     runStart = x;
                 else if (!black && runStart >= 0)
                 {
-                    var runWidth = x - runStart;
-                    sb.Append(
-                        CultureInfo.InvariantCulture,
-                        $"<rect x=\"{runStart}\" y=\"{y}\" width=\"{runWidth}\" height=\"{barDrawHeight}\" fill=\"#000\"/>"
-                    );
+                    SvgMarkup.AppendBlackRect(sb, runStart, y, x - runStart, barDrawHeight);
                     runStart = -1;
                 }
             }

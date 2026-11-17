@@ -8,25 +8,27 @@ namespace OxyKit.Render.Core.Outputs;
 /// </summary>
 internal static partial class PrintBaselineInjector
 {
+    private static readonly string StyleBlock =
+        "<style>\n" + PrintBaselineCss.Content + "\n</style>";
+
     public static string Apply(string html)
     {
         ArgumentException.ThrowIfNullOrEmpty(html);
 
-        var style = "<style>\n" + PrintBaselineCss.Content + "\n</style>";
         var headOpen = HeadOpenTag().Match(html);
         if (headOpen.Success)
         {
             var insertAt = headOpen.Index + headOpen.Length;
-            return html[..insertAt] + "\n" + style + "\n" + html[insertAt..];
+            return html[..insertAt] + "\n" + StyleBlock + "\n" + html[insertAt..];
         }
 
         var bodyOpen = html.IndexOf("<body", StringComparison.OrdinalIgnoreCase);
         if (bodyOpen >= 0)
         {
-            return html[..bodyOpen] + style + "\n" + html[bodyOpen..];
+            return html[..bodyOpen] + StyleBlock + "\n" + html[bodyOpen..];
         }
 
-        return style + "\n" + html;
+        return StyleBlock + "\n" + html;
     }
 
     [GeneratedRegex(@"<head\b[^>]*>", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)]

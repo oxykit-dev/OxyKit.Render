@@ -12,31 +12,22 @@ namespace OxyKit.Render.Core.Inputs;
 internal static class ScribanTemplateRenderer
 {
     public static string Render(string templateHtml, JsonElement data) =>
-        Render(templateHtml, data, templateDirectory: null, options: null);
+        Render(Parse(templateHtml), data, templateDirectory: null, options: null);
 
     public static string Render(
         string templateHtml,
         JsonElement data,
         string? templateDirectory,
         RenderingOptions? options
+    ) => Render(Parse(templateHtml), data, templateDirectory, options);
+
+    public static string Render(
+        Template template,
+        JsonElement data,
+        string? templateDirectory,
+        RenderingOptions? options
     )
     {
-        Template template;
-        try
-        {
-            template = Template.Parse(templateHtml);
-        }
-        catch (Exception ex)
-        {
-            throw new ArgumentException($"Template parse failed: {Sanitize(ex.Message)}");
-        }
-
-        if (template.HasErrors)
-        {
-            var message = string.Join("; ", template.Messages.Select(m => m.Message));
-            throw new ArgumentException($"Template parse failed: {Sanitize(message)}");
-        }
-
         var scriptObject = new ScriptObject();
         if (data.ValueKind == JsonValueKind.Object)
         {
@@ -77,6 +68,27 @@ internal static class ScribanTemplateRenderer
         }
     }
 
+    public static Template Parse(string templateHtml)
+    {
+        Template template;
+        try
+        {
+            template = Template.Parse(templateHtml);
+        }
+        catch (Exception ex)
+        {
+            throw new ArgumentException($"Template parse failed: {Sanitize(ex.Message)}");
+        }
+
+        if (template.HasErrors)
+        {
+            var message = string.Join("; ", template.Messages.Select(m => m.Message));
+            throw new ArgumentException($"Template parse failed: {Sanitize(message)}");
+        }
+
+        return template;
+    }
+
     private static object? ToScribanValue(JsonElement element) =>
         element.ValueKind switch
         {
@@ -106,7 +118,7 @@ internal static class ScribanTemplateRenderer
 
     private static ScriptArray ToScriptArray(JsonElement element)
     {
-        var array = new ScriptArray();
+        var array = new ScriptArray(element.GetArrayLength());
         foreach (var item in element.EnumerateArray())
         {
             array.Add(ToScribanValue(item));

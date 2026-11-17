@@ -1,4 +1,3 @@
-using System.Globalization;
 using Scriban.Runtime;
 
 namespace OxyKit.Render.Core.Inputs;
@@ -88,18 +87,12 @@ internal static class TemplateAssetFunctions
         }
 
         var bytes = File.ReadAllBytes(fullPath);
-        var mediaType = MediaTypes[ext];
         var b64 = Convert.ToBase64String(bytes);
-        var altText = string.IsNullOrWhiteSpace(alt) ? "" : alt.Trim();
-        altText = System.Net.WebUtility.HtmlEncode(altText);
-
-        var widthAttr = FormatSizeAttr("width", width);
-        var heightAttr = FormatSizeAttr("height", height);
-
-        return string.Create(
-            CultureInfo.InvariantCulture,
-            $"<img src=\"data:{mediaType};base64,{b64}\" alt=\"{altText}\"{widthAttr}{heightAttr} />"
+        var altText = System.Net.WebUtility.HtmlEncode(
+            string.IsNullOrWhiteSpace(alt) ? "" : alt.Trim()
         );
+
+        return $"<img src=\"data:{MediaTypes[ext]};base64,{b64}\" alt=\"{altText}\"{FormatSizeAttr("width", width)}{FormatSizeAttr("height", height)} />";
     }
 #pragma warning restore IDE1006
 

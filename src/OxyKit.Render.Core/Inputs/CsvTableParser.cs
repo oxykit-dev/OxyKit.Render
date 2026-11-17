@@ -1,3 +1,5 @@
+using System.Text;
+
 namespace OxyKit.Render.Core.Inputs;
 
 /// <summary>
@@ -9,12 +11,13 @@ internal static class CsvTableParser
     {
         ArgumentNullException.ThrowIfNull(content);
 
-        if (content.Length > 0 && content[0] == '\uFEFF')
+        var text = content.AsSpan();
+        if (text.Length > 0 && text[0] == '\uFEFF')
         {
-            content = content[1..];
+            text = text[1..];
         }
 
-        var grid = ParseGrid(content);
+        var grid = ParseGrid(text);
         if (grid.Count == 0)
         {
             throw new ArgumentException("CSV content must contain at least one row.");
@@ -26,7 +29,7 @@ internal static class CsvTableParser
         if (hasHeader)
         {
             headers = grid[0];
-            dataRows = grid.Count > 1 ? grid.Skip(1).ToArray() : [];
+            dataRows = grid.Count > 1 ? grid.GetRange(1, grid.Count - 1) : [];
             if (headers.Count == 0)
             {
                 throw new ArgumentException("CSV header row must contain at least one column.");
@@ -41,11 +44,11 @@ internal static class CsvTableParser
         return TableWorkbookConstraints.ValidateStringGrid(sheetName, headers, dataRows);
     }
 
-    private static List<IReadOnlyList<string>> ParseGrid(string content)
+    private static List<IReadOnlyList<string>> ParseGrid(ReadOnlySpan<char> content)
     {
         var rows = new List<IReadOnlyList<string>>();
         var fields = new List<string>();
-        var field = new System.Text.StringBuilder();
+        var field = new StringBuilder();
         var inQuotes = false;
         var i = 0;
 

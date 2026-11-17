@@ -179,6 +179,40 @@ public sealed class TemplatePackTests : IDisposable
         Assert.Contains("allowlisted", ex.Message, StringComparison.OrdinalIgnoreCase);
     }
 
+    [Fact]
+    public async Task Load_ReusesParsedTemplateUntilStampOrInvalidate()
+    {
+        var store = CreateStore();
+        await using var zip = CreateZip(
+            ("template.html", "<p>{{ name }}</p>"),
+            ("contract.json", """{"type":"object","properties":{"name":{"type":"string"}}}""")
+        );
+        await store.SaveFromZipAsync("cached", zip, TestContext.Current.CancellationToken);
+
+        var first = store.Load("cached");
+        var second = store.Load("cached");
+        Assert.Same(first.Parsed, second.Parsed);
+
+        var templatePath = Path.Combine(_root, "cached", "template.html");
+        File.WriteAllText(templatePath, "<p>v2 {{ name }}</p>");
+        // Ensure mtime advances on coarse filesystems.
+        File.SetLastWriteTimeUtc(templatePath, DateTime.UtcNow.AddSeconds(2));
+
+        var third = store.Load("cached");
+        Assert.NotSame(first.Parsed, third.Parsed);
+        Assert.Contains("v2", third.Html, StringComparison.Ordinal);
+
+        await using var zip2 = CreateZip(
+            ("template.html", "<p>v3 {{ name }}</p>"),
+            ("contract.json", """{"type":"object","properties":{"name":{"type":"string"}}}""")
+        );
+        await store.SaveFromZipAsync("cached", zip2, TestContext.Current.CancellationToken);
+
+        var fourth = store.Load("cached");
+        Assert.NotSame(third.Parsed, fourth.Parsed);
+        Assert.Contains("v3", fourth.Html, StringComparison.Ordinal);
+    }
+
     private TemplateStore CreateStore()
     {
         var options = Options.Create(

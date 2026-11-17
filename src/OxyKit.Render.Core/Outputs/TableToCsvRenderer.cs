@@ -17,58 +17,71 @@ internal sealed class TableToCsvRenderer
         cancellationToken.ThrowIfCancellationRequested();
 
         var sheet = workbook.Sheets[0];
-        var csv = new StringBuilder();
+        var csv = new StringBuilder(EstimateCapacity(sheet));
 
         if (sheet.Headers.Count > 0)
         {
-            AppendRow(csv, sheet.Headers.Select(static h => h));
+            for (var i = 0; i < sheet.Headers.Count; i++)
+            {
+                if (i > 0)
+                    csv.Append(',');
+                AppendEscaped(csv, sheet.Headers[i]);
+            }
+
+            csv.Append("\r\n");
         }
 
         foreach (var row in sheet.Rows)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            AppendRow(csv, row.Select(TableCellText.Format));
+            for (var i = 0; i < row.Count; i++)
+            {
+                if (i > 0)
+                    csv.Append(',');
+                AppendEscaped(csv, TableCellText.Format(row[i]));
+            }
+
+            csv.Append("\r\n");
         }
 
-        var preamble = Encoding.UTF8.GetPreamble();
         var body = Encoding.UTF8.GetBytes(csv.ToString());
+        var preamble = Encoding.UTF8.GetPreamble();
         var bytes = new byte[preamble.Length + body.Length];
-        Buffer.BlockCopy(preamble, 0, bytes, 0, preamble.Length);
-        Buffer.BlockCopy(body, 0, bytes, preamble.Length, body.Length);
+        preamble.CopyTo(bytes);
+        body.CopyTo(bytes.AsSpan(preamble.Length));
 
         return Task.FromResult(new RenderResult(bytes, "text/csv", "document.csv"));
     }
 
-    private static void AppendRow(StringBuilder csv, IEnumerable<string> fields)
+    private static int EstimateCapacity(ValidatedSheet sheet)
     {
-        var first = true;
-        foreach (var field in fields)
-        {
-            if (!first)
-            {
-                csv.Append(',');
-            }
-
-            first = false;
-            csv.Append(EscapeField(field));
-        }
-
-        csv.Append("\r\n");
+        var cells = sheet.Headers.Count;
+        foreach (var row in sheet.Rows)
+            cells += row.Count;
+        return Math.Max(64, cells * 12);
     }
 
-    private static string EscapeField(string value)
+    private static void AppendEscaped(StringBuilder csv, string value)
     {
-        var needsQuotes =
-            value.Contains('"')
-            || value.Contains(',')
-            || value.Contains('\r')
-            || value.Contains('\n');
-
-        if (!needsQuotes)
+        if (
+            !value.Contains('"')
+            && !value.Contains(',')
+            && !value.Contains('\r')
+            && !value.Contains('\n')
+        )
         {
-            return value;
+            csv.Append(value);
+            return;
         }
 
-        return "\"" + value.Replace("\"", "\"\"") + "\"";
+        csv.Append('"');
+        foreach (var ch in value)
+        {
+            if (ch == '"')
+                csv.Append('"');
+            csv.Append(ch);
+        }
+
+        csv.Append('"');
     }
 }

@@ -81,11 +81,23 @@ internal static class IsoDateCell
 
     public static string Format(DateTime value)
     {
-        var core = value
-            .ToString("yyyy-MM-dd'T'HH:mm:ss.FFFFFFF", CultureInfo.InvariantCulture)
-            .TrimEnd('0')
-            .TrimEnd('.');
+        // Max: yyyy-MM-ddTHH:mm:ss.FFFFFFF + optional Z (28 chars).
+        Span<char> buffer = stackalloc char[28];
+        value.TryFormat(
+            buffer,
+            out var written,
+            "yyyy-MM-dd'T'HH:mm:ss.FFFFFFF",
+            CultureInfo.InvariantCulture
+        );
 
-        return value.Kind == DateTimeKind.Utc ? core + "Z" : core;
+        while (written > 0 && buffer[written - 1] == '0')
+            written--;
+        if (written > 0 && buffer[written - 1] == '.')
+            written--;
+
+        if (value.Kind == DateTimeKind.Utc)
+            buffer[written++] = 'Z';
+
+        return new string(buffer[..written]);
     }
 }

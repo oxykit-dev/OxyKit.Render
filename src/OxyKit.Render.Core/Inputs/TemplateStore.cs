@@ -1,6 +1,8 @@
+using System.Collections.Concurrent;
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+using Scriban;
 
 namespace OxyKit.Render.Core.Inputs;
 
@@ -8,7 +10,8 @@ internal sealed record TemplateDefinition(
     string Id,
     string Html,
     string ContractJson,
-    string Directory
+    string Directory,
+    Template Parsed
 );
 
 internal sealed record TemplateInfo(string Id, bool HasContract);
@@ -16,11 +19,16 @@ internal sealed record TemplateInfo(string Id, bool HasContract);
 /// <summary>
 /// Loads templates from a configured root. Each template is a subdirectory with
 /// <c>template.html</c> and required <c>contract.json</c>.
+/// Caches HTML + contract + parsed Scriban; invalidated on pack write/delete and when
+/// on-disk mtime/size stamps change (out-of-band edits).
 /// </summary>
 internal sealed partial class TemplateStore
 {
     private readonly string _rootPath;
     private readonly RenderingOptions _options;
+    private readonly ConcurrentDictionary<string, CacheEntry> _cache = new(
+        StringComparer.OrdinalIgnoreCase
+    );
 
     public TemplateStore(IOptions<RenderingOptions> options, IHostEnvironment environment)
     {
@@ -74,6 +82,18 @@ internal sealed partial class TemplateStore
             throw new ArgumentException($"Template '{id}' is missing required contract.json.");
         }
 
+        var templateStamp = ReadStamp(templatePath);
+        var contractStamp = ReadStamp(contractPath);
+
+        if (
+            _cache.TryGetValue(id, out var cached)
+            && cached.TemplateStamp == templateStamp
+            && cached.ContractStamp == contractStamp
+        )
+        {
+            return cached.Definition;
+        }
+
         var html = File.ReadAllText(templatePath);
         if (html.Length > _options.MaxTemplateChars)
         {
@@ -90,7 +110,18 @@ internal sealed partial class TemplateStore
             );
         }
 
-        return new TemplateDefinition(id, html, contractJson, dir);
+        var parsed = ScribanTemplateRenderer.Parse(html);
+        var definition = new TemplateDefinition(id, html, contractJson, dir, parsed);
+        _cache[id] = new CacheEntry(definition, templateStamp, contractStamp);
+        return definition;
+    }
+
+    internal void Invalidate(string templateId) => _cache.TryRemove(templateId, out _);
+
+    private static FileStamp ReadStamp(string path)
+    {
+        var info = new FileInfo(path);
+        return new FileStamp(info.LastWriteTimeUtc.Ticks, info.Length);
     }
 
     private static string ResolveRoot(string configured, string contentRoot)
@@ -148,6 +179,14 @@ internal sealed partial class TemplateStore
 
         return candidate;
     }
+
+    private readonly record struct FileStamp(long Ticks, long Length);
+
+    private sealed record CacheEntry(
+        TemplateDefinition Definition,
+        FileStamp TemplateStamp,
+        FileStamp ContractStamp
+    );
 
     [GeneratedRegex("^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$", RegexOptions.CultureInvariant)]
     private static partial Regex SafeTemplateId();
